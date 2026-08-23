@@ -140,7 +140,13 @@
       HT_DATA.getAdminSession().then(function (session) {
         var email = session && session.user && session.user.email;
         var hasRealSession = !!(email && ADMIN_EMAILS.indexOf(email) !== -1);
-        document.getElementById('noWriteSessionNote').style.display = hasRealSession ? 'none' : 'flex';
+        var note = document.getElementById('noWriteSessionNote');
+        note.style.display = 'flex';
+        note.textContent = 'DIAGNOSTIKA: ' + (session ? ('სესია არსებობს, ელფოსტა: ' + (email || '(არცერთი)') + ', ადმინია: ' + hasRealSession) : 'სესია საერთოდ არ არსებობს ამ გვერდზე');
+      }).catch(function (err) {
+        var note = document.getElementById('noWriteSessionNote');
+        note.style.display = 'flex';
+        note.textContent = 'DIAGNOSTIKA: შეცდომა სესიის შემოწმებისას: ' + (err && err.message ? err.message : err);
       });
     }
     function isAllowlistedEmail() {
