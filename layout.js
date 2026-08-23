@@ -121,7 +121,7 @@
           sub +
           '<div class="nav-divider"></div>' +
           '<a class="nav-link" href="profile.html?tab=wishlist" id="wishNavLink">' + icon('heart') + ' რჩეულები <span class="badge" id="wishCount" style="margin-right:auto"></span></a>' +
-          '<a class="call-btn" href="tel:+995555123456">' + icon('phone') + ' +995 555 12 34 56</a>' +
+          '<a class="call-btn" href="tel:+995500055993">' + icon('phone') + ' +995 500 05 59 93</a>' +
         '</div>' +
         '<div id="authSlot"></div>' +
         '<button class="nav-toggle" id="navToggle" type="button" aria-label="მენიუ" aria-expanded="false">' +
