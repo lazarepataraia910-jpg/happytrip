@@ -1,8 +1,7 @@
 (function () {
   var K = {
     wishlist: 'ht_wishlist', compare: 'ht_compare', bookings: 'ht_bookings',
-    profile: 'ht_profile', theme: 'ht_theme', newsletter: 'ht_newsletter',
-    adminSession: 'ht_admin_session'
+    profile: 'ht_profile', theme: 'ht_theme', newsletter: 'ht_newsletter'
   };
 
   function read(key, fallback) {
@@ -97,10 +96,7 @@
         if (list[i].reference === ref) { list[i].status = status; write(K.bookings, list); return true; }
       }
       return false;
-    },
-
-    isAdminSession: function () { return read(K.adminSession, false) === true; },
-    setAdminSession: function (v) { write(K.adminSession, !!v); }
+    }
   };
 
   window.HT_STORE = HT_STORE;

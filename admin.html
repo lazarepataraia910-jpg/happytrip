@@ -153,7 +153,7 @@
       var profile = HT_STORE.getProfile();
       return !!(profile && profile.provider === 'google' && ADMIN_EMAILS.indexOf(profile.email) !== -1);
     }
-    if (isAllowlistedEmail() || HT_STORE.isAdminSession()) showDashboard();
+    if (isAllowlistedEmail()) showDashboard();
 
     document.getElementById('gateBtn').addEventListener('click', tryLogin);
     document.getElementById('gatePassword').addEventListener('keydown', function (e) {
@@ -161,11 +161,10 @@
     });
     function tryLogin() {
       var val = document.getElementById('gatePassword').value;
-      if (val === DEMO_PASSWORD) { HT_STORE.setAdminSession(true); showDashboard(); }
+      if (val === DEMO_PASSWORD) { showDashboard(); }
       else HT.toast('არასწორი პაროლი');
     }
     document.getElementById('logoutBtn').addEventListener('click', function () {
-      HT_STORE.setAdminSession(false);
       dashboard.style.display = 'none';
       gate.style.display = 'block';
     });
