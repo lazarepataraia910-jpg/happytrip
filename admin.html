@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ადმინ პანელი — HappyTrip</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
+<script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .gate-box { max-width: 360px; margin: 90px auto; text-align: center; }
+  .gate-box .feat-icon { width: 52px; height: 52px; border-radius: 14px; margin: 0 auto 16px; }
+  .gate-box h1 { font-size: 19px; margin: 0 0 8px; }
+  .gate-box p { color: var(--slate); font-size: 13px; margin: 0 0 20px; }
+  .panel-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+</style>
+</head>
+<body data-page="">
+<a class="skip-link" href="#main">გვერდის შემცველობაზე გადასვლა</a>
+<header class="site-header" id="site-header"></header>
+
+<main id="main">
+  <div id="gate">
+    <div class="panel gate-box">
+      <div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+      <h1>ადმინისტრატორის შესვლა</h1>
+      <p>ეს არის დემო-გვერდის დაცვა კლიენტის მხარეს — არა რეალური ავტორიზაციის სისტემა.</p>
+      <div class="field"><input type="password" id="gatePassword" placeholder="პაროლი (მინიშნება: admin123)" /></div>
+      <button class="btn btn-primary btn-block" id="gateBtn">შესვლა</button>
+    </div>
+  </div>
+
+  <div id="dashboard" style="display:none">
+    <div class="breadcrumb"><a href="index.html">მთავარი</a><span class="sep">/</span><span class="current">ადმინ პანელი</span></div>
+    <div class="panel-actions">
+      <h1 class="display" style="font-size:24px;margin:0">ადმინ პანელი</h1>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn">გამოსვლა</button>
+    </div>
+
+    <div class="admin-stat-row">
+      <div class="admin-stat"><b id="statTours">0</b><span>აქტიური ტური</span></div>
+      <div class="admin-stat"><b id="statDest">0</b><span>დანიშნულება</span></div>
+      <div class="admin-stat"><b id="statBookings">0</b><span>ჯავშანი სულ</span></div>
+      <div class="admin-stat"><b id="statRevenue">0 ₾</b><span>დადასტურებული შემოსავალი</span></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tours">ტურები</button>
+      <button class="tab-btn" data-tab="destinations">დანიშნულებები</button>
+      <button class="tab-btn" data-tab="bookings">ჯავშნები</button>
+    </div>
+
+    <div class="tab-panel active" data-panel="tours">
+      <div class="panel-actions"><span></span><button class="btn btn-primary btn-sm" id="addTourBtn"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ახალი ტურის დამატება</button></div>
+      <div class="panel" style="padding:0;overflow-x:auto"><table class="admin-table" id="toursTable"></table></div>
+    </div>
+
+    <div class="tab-panel" data-panel="destinations">
+      <div class="alert alert-info" style="margin-bottom:16px">დანიშნულებების რედაქტირება ამ ვერსიაში მხოლოდ სანახავია — სრული მართვა მალე დაემატება.</div>
+      <div class="panel" style="padding:0;overflow-x:auto"><table class="admin-table" id="destTable"></table></div>
+    </div>
+
+    <div class="tab-panel" data-panel="bookings">
+      <div class="panel" style="padding:0;overflow-x:auto"><table class="admin-table" id="bookingsTable"></table></div>
+    </div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="tourModal">
+  <div class="modal-box wide">
+    <h3 id="tourModalTitle">ახალი ტური</h3>
+    <div class="field-row">
+      <div class="field"><label>სახელი</label><input type="text" id="tfTitle" /></div>
+      <div class="field"><label>დანიშნულება</label><select id="tfDestination"></select></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>ტიპი</label>
+        <select id="tfType">
+          <option value="adventure">სათავგადასავლო</option><option value="cultural">კულტურული</option>
+          <option value="wine">ღვინის ტური</option><option value="family">საოჯახო</option>
+          <option value="luxury">ლუქსი</option><option value="daytrip">ერთდღიანი</option>
+          <option value="trekking">მთის ტრეკინგი</option><option value="seaside">ზღვისპირა</option>
+        </select>
+      </div>
+      <div class="field"><label>სირთულე</label>
+        <select id="tfDifficulty"><option value="easy">ადვილი</option><option value="moderate">საშუალო</option><option value="hard">რთული</option></select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>ხანგრძლივობა (დღე)</label><input type="number" id="tfDuration" min="1" value="1" /></div>
+      <div class="field"><label>ჯგუფი (მინ–მაქს)</label><input type="text" id="tfGroup" placeholder="2-12" value="2-12" /></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>საბაზისო ფასი (₾)</label><input type="number" id="tfPriceBasic" value="100" /></div>
+      <div class="field"><label>სტანდარტი ფასი (₾)</label><input type="number" id="tfPriceStandard" value="140" /></div>
+      <div class="field"><label>პრემიუმ ფასი (₾)</label><input type="number" id="tfPricePremium" value="200" /></div>
+    </div>
+    <div class="field"><label>მოკლე აღწერა</label><textarea id="tfSummary"></textarea></div>
+    <div class="field-row">
+      <div class="field"><label>რა შედის ფასში (მძიმით გამოყოფილი)</label><input type="text" id="tfInclusions" placeholder="გიდი, ტრანსპორტი" /></div>
+      <div class="field"><label>რა არ შედის (მძიმით გამოყოფილი)</label><input type="text" id="tfExclusions" placeholder="სადილი" /></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>შეხვედრის წერტილი</label><input type="text" id="tfMeeting" /></div>
+      <div class="field"><label>ენები (მძიმით გამოყოფილი)</label><input type="text" id="tfLanguages" value="ქართული, ინგლისური" /></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>ფასდაკლება (%)</label><input type="number" id="tfDiscount" value="0" /></div>
+      <div class="field" style="display:flex;align-items:center;padding-top:22px"><label class="checkbox-row"><input type="checkbox" id="tfFeatured" /> გამორჩეულ ტურებში ჩვენება</label></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn-ghost" id="tourModalCancel" style="flex:1">გაუქმება</button>
+      <button class="btn btn-primary" id="tourModalSave" style="flex:1">შენახვა</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="layout.js"></script>
+<script>
+  (function () {
+    var gate = document.getElementById('gate');
+    var dashboard = document.getElementById('dashboard');
+    var DEMO_PASSWORD = 'admin123';
+
+    function showDashboard() {
+      gate.style.display = 'none';
+      dashboard.style.display = 'block';
+      renderAll();
+    }
+    if (HT_STORE.isAdminSession()) showDashboard();
+
+    document.getElementById('gateBtn').addEventListener('click', tryLogin);
+    document.getElementById('gatePassword').addEventListener('keydown', function (e) { if (e.key === 'Enter') tryLogin(); });
+    function tryLogin() {
+      var val = document.getElementById('gatePassword').value;
+      if (val === DEMO_PASSWORD) { HT_STORE.setAdminSession(true); showDashboard(); }
+      else HT.toast('არასწორი პაროლი');
+    }
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+      HT_STORE.setAdminSession(false);
+      dashboard.style.display = 'none';
+      gate.style.display = 'block';
+    });
+
+    var tabs = document.querySelectorAll('.tabs .tab-btn');
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function () {
+        tabs.forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+        t.classList.add('active');
+        document.querySelector('[data-panel="' + t.dataset.tab + '"]').classList.add('active');
+      });
+    });
+
+    function renderAll() {
+      renderStats();
+      renderTours();
+      renderDestinations();
+      renderBookings();
+    }
+
+    function renderStats() {
+      var tours = HT_DATA.getAllTours();
+      var bookings = HT_STORE.getBookings();
+      var revenue = bookings.filter(function (b) { return b.status === 'დადასტურებული'; }).reduce(function (s, b) { return s + b.total; }, 0);
+      document.getElementById('statTours').textContent = tours.length;
+      document.getElementById('statDest').textContent = HT_DATA.getDestinations().length;
+      document.getElementById('statBookings').textContent = bookings.length;
+      document.getElementById('statRevenue').textContent = HT.formatGel(revenue);
+    }
+
+    function renderTours() {
+      var tours = HT_DATA.getAllTours();
+      var table = document.getElementById('toursTable');
+      table.innerHTML = '<tr><th>სახელი</th><th>დანიშნულება</th><th>ტიპი</th><th>ფასი</th><th>გამორჩეული</th><th></th></tr>' +
+        tours.map(function (t) {
+          var dest = HT_DATA.getDestinationById(t.destinationId);
+          return '<tr><td>' + t.title + '</td><td>' + (dest ? dest.name : '—') + '</td><td>' + t.typeLabel + '</td><td>' + HT.formatGel(t.priceBasic) + '</td><td>' + (t.featured ? 'დიახ' : '—') + '</td>' +
+            '<td><div class="admin-actions"><button data-edit="' + t.id + '">' + HT.icon('edit') + '</button><button class="danger" data-del="' + t.id + '">' + HT.icon('trash') + '</button></div></td></tr>';
+        }).join('');
+      table.querySelectorAll('[data-edit]').forEach(function (btn) { btn.addEventListener('click', function () { openTourModal(HT_DATA.getTourById(btn.dataset.edit)); }); });
+      table.querySelectorAll('[data-del]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (!confirm('წავშალო ეს ტური?')) return;
+          HT_STORE.deleteTour(btn.dataset.del);
+          renderAll();
+          HT.toast('ტური წაიშალა');
+        });
+      });
+    }
+
+    function renderDestinations() {
+      var dests = HT_DATA.getDestinations();
+      var table = document.getElementById('destTable');
+      table.innerHTML = '<tr><th>სახელი</th><th>რეგიონი</th><th>ტურების რაოდენობა</th></tr>' +
+        dests.map(function (d) {
+          var count = HT_DATA.getTours({ destinationId: d.id }).length;
+          return '<tr><td>' + d.name + '</td><td>' + d.region + '</td><td>' + count + '</td></tr>';
+        }).join('');
+    }
+
+    function renderBookings() {
+      var bookings = HT_STORE.getBookings();
+      var table = document.getElementById('bookingsTable');
+      if (!bookings.length) { table.innerHTML = '<tr><td style="text-align:center;color:var(--slate);padding:30px">ჯავშნები ჯერ არ არის</td></tr>'; return; }
+      table.innerHTML = '<tr><th>რეფერენსი</th><th>ტური</th><th>კონტაქტი</th><th>მოგზაურები</th><th>ჯამი</th><th>სტატუსი</th><th></th></tr>' +
+        bookings.map(function (b) {
+          return '<tr><td style="font-family:monospace">' + b.reference + '</td><td>' + b.tourTitle + '</td><td>' + b.contactName + '<br><span style="color:var(--slate);font-size:12px">' + b.contactEmail + '</span></td><td>' + b.travelers + '</td><td>' + HT.formatGel(b.total) + '</td><td>' + b.status + '</td>' +
+            '<td><div class="admin-actions">' +
+            (b.status !== 'დადასტურებული' ? '<button data-confirm="' + b.reference + '">' + HT.icon('check') + '</button>' : '') +
+            (b.status !== 'გაუქმებული' ? '<button class="danger" data-cancel="' + b.reference + '">' + HT.icon('x') + '</button>' : '') +
+            '</div></td></tr>';
+        }).join('');
+      table.querySelectorAll('[data-confirm]').forEach(function (btn) { btn.addEventListener('click', function () { HT_STORE.updateBookingStatus(btn.dataset.confirm, 'დადასტურებული'); renderAll(); }); });
+      table.querySelectorAll('[data-cancel]').forEach(function (btn) { btn.addEventListener('click', function () { HT_STORE.updateBookingStatus(btn.dataset.cancel, 'გაუქმებული'); renderAll(); }); });
+    }
+
+    var tourModal = document.getElementById('tourModal');
+    var editingId = null;
+    function openTourModal(tour) {
+      editingId = tour ? tour.id : null;
+      document.getElementById('tourModalTitle').textContent = tour ? 'ტურის რედაქტირება' : 'ახალი ტური';
+      var destSel = document.getElementById('tfDestination');
+      destSel.innerHTML = HT_DATA.getDestinations().map(function (d) { return '<option value="' + d.id + '">' + d.name + '</option>'; }).join('');
+
+      document.getElementById('tfTitle').value = tour ? tour.title : '';
+      destSel.value = tour ? tour.destinationId : HT_DATA.getDestinations()[0].id;
+      document.getElementById('tfType').value = tour ? tour.type : 'adventure';
+      document.getElementById('tfDifficulty').value = tour ? tour.difficulty : 'easy';
+      document.getElementById('tfDuration').value = tour ? tour.durationDays : 1;
+      document.getElementById('tfGroup').value = tour ? (tour.groupMin + '-' + tour.groupMax) : '2-12';
+      document.getElementById('tfPriceBasic').value = tour ? tour.priceBasic : 100;
+      document.getElementById('tfPriceStandard').value = tour ? tour.priceStandard : 140;
+      document.getElementById('tfPricePremium').value = tour ? tour.pricePremium : 200;
+      document.getElementById('tfSummary').value = tour ? tour.summary : '';
+      document.getElementById('tfInclusions').value = tour ? tour.inclusions.join(', ') : '';
+      document.getElementById('tfExclusions').value = tour ? tour.exclusions.join(', ') : '';
+      document.getElementById('tfMeeting').value = tour ? tour.meetingPoint : '';
+      document.getElementById('tfLanguages').value = tour ? tour.languages.join(', ') : 'ქართული, ინგლისური';
+      document.getElementById('tfDiscount').value = tour ? tour.discount : 0;
+      document.getElementById('tfFeatured').checked = tour ? !!tour.featured : false;
+
+      tourModal.classList.add('open');
+    }
+    document.getElementById('addTourBtn').addEventListener('click', function () { openTourModal(null); });
+    document.getElementById('tourModalCancel').addEventListener('click', function () { tourModal.classList.remove('open'); });
+    tourModal.addEventListener('click', function (e) { if (e.target === tourModal) tourModal.classList.remove('open'); });
+
+    var TYPE_LABELS = { adventure: 'სათავგადასავლო', cultural: 'კულტურული', wine: 'ღვინის ტური', family: 'საოჯახო', luxury: 'ლუქსი', daytrip: 'ერთდღიანი', trekking: 'მთის ტრეკინგი', seaside: 'ზღვისპირა' };
+    var DIFF_LABELS = { easy: 'ადვილი', moderate: 'საშუალო', hard: 'რთული' };
+
+    document.getElementById('tourModalSave').addEventListener('click', function () {
+      var title = document.getElementById('tfTitle').value.trim();
+      if (!title) { HT.toast('შეიყვანეთ ტურის სახელი'); return; }
+      var group = document.getElementById('tfGroup').value.split('-').map(Number);
+      var type = document.getElementById('tfType').value;
+      var difficulty = document.getElementById('tfDifficulty').value;
+      var fields = {
+        title: title,
+        slug: editingId ? undefined : title.toLowerCase().replace(/[^a-z0-9ა-ჰ]+/gi, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36).slice(-4),
+        destinationId: document.getElementById('tfDestination').value,
+        type: type, typeLabel: TYPE_LABELS[type],
+        difficulty: difficulty, difficultyLabel: DIFF_LABELS[difficulty],
+        durationDays: Number(document.getElementById('tfDuration').value) || 1,
+        groupMin: group[0] || 1, groupMax: group[1] || group[0] || 10,
+        priceBasic: Number(document.getElementById('tfPriceBasic').value) || 0,
+        priceStandard: Number(document.getElementById('tfPriceStandard').value) || 0,
+        pricePremium: Number(document.getElementById('tfPricePremium').value) || 0,
+        summary: document.getElementById('tfSummary').value.trim(),
+        inclusions: document.getElementById('tfInclusions').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean),
+        exclusions: document.getElementById('tfExclusions').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean),
+        meetingPoint: document.getElementById('tfMeeting').value.trim(),
+        languages: document.getElementById('tfLanguages').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean),
+        discount: Number(document.getElementById('tfDiscount').value) || 0,
+        featured: document.getElementById('tfFeatured').checked
+      };
+
+      if (editingId) {
+        delete fields.slug;
+        HT_STORE.setTourEdit(editingId, fields);
+        HT.toast('ტური განახლდა');
+      } else {
+        fields.rating = 5.0; fields.reviewCount = 0; fields.reviews = [];
+        fields.theme = 'th-2'; fields.icon = 'mountain';
+        fields.itinerary = [{ day: 1, title: 'ტურის დღე 1', desc: fields.summary || '' }];
+        HT_STORE.addTour(fields);
+        HT.toast('ტური დაემატა');
+      }
+      tourModal.classList.remove('open');
+      renderAll();
+    });
+  })();
+</script>
+</body>
+</html>

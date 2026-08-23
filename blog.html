@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ბლოგი — HappyTrip</title>
+<meta name="description" content="სამოგზაურო რჩევები, კულინარიული გზამკვლევები და საქართველოს კულტურის ისტორიები." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
+<script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .blog-card .card-media { aspect-ratio: 16/10; }
+  .blog-card .card-body p { font-size: 13px; color: var(--slate); line-height: 1.6; margin: 0; }
+  .blog-card .card-meta { justify-content: space-between; }
+</style>
+</head>
+<body data-page="blog">
+<a class="skip-link" href="#main">გვერდის შემცველობაზე გადასვლა</a>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="index.html">მთავარი</a><span class="sep">/</span><span class="current">ბლოგი</span></div>
+    <div class="eyebrow">HappyTrip ბლოგი</div>
+    <h1 class="display">რჩევები და შთაგონება</h1>
+    <p>ყველაფერი, რაც გჭირდებათ საქართველოში მოგზაურობის დასაგეგმად — ადგილობრივი ავტორებისგან.</p>
+  </div>
+</div>
+
+<main id="main">
+  <div class="accordion-cats" id="catFilters"></div>
+  <div class="grid grid-3" id="blogGrid"></div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="layout.js"></script>
+<script>
+  (function () {
+    var posts = HT_DATA.getBlogPosts();
+    var cats = ['ყველა'];
+    posts.forEach(function (p) { if (cats.indexOf(p.category) === -1) cats.push(p.category); });
+    var activeCat = 'ყველა';
+
+    var catFilters = document.getElementById('catFilters');
+    function renderCats() {
+      catFilters.innerHTML = '';
+      cats.forEach(function (c) {
+        var btn = document.createElement('button');
+        btn.className = 'accordion-cat' + (c === activeCat ? ' active' : '');
+        btn.type = 'button';
+        btn.textContent = c;
+        btn.addEventListener('click', function () { activeCat = c; renderCats(); renderGrid(); });
+        catFilters.appendChild(btn);
+      });
+    }
+
+    var grid = document.getElementById('blogGrid');
+    function renderGrid() {
+      grid.innerHTML = '';
+      var list = activeCat === 'ყველა' ? posts : posts.filter(function (p) { return p.category === activeCat; });
+      list.forEach(function (post) {
+        var el = document.createElement('a');
+        el.href = 'post.html?slug=' + post.slug;
+        el.className = 'card blog-card';
+        el.innerHTML = '<div class="card-media">' + HT.phMedia(post.theme, post.icon) + '</div>' +
+          '<div class="card-body"><span class="tag" style="align-self:flex-start">' + post.category + '</span>' +
+          '<h3 class="card-title">' + post.title + '</h3><p>' + post.excerpt + '</p>' +
+          '<div class="card-meta"><span>' + post.author + '</span><span>' + post.readMinutes + ' წუთი</span></div></div>';
+        grid.appendChild(el);
+      });
+    }
+    renderCats();
+    renderGrid();
+  })();
+</script>
+</body>
+</html>

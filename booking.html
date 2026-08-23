@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ჯავშანი — HappyTrip</title>
+<meta name="description" content="დაასრულეთ თქვენი ტურის ჯავშანი — მოგზაურთა დეტალები, დამატებითი სერვისები და დადასტურება." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
+<script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .booking-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 32px; align-items: flex-start; }
+  @media (max-width: 900px) { .booking-layout { grid-template-columns: 1fr; } }
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+  .traveler-block { border: 1px solid var(--line-light); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .traveler-block b { font-size: 13px; display: block; margin-bottom: 10px; }
+  .extra-item { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid var(--line-light); border-radius: 12px; margin-bottom: 10px; }
+  .extra-item input { width: auto; margin-top: 3px; }
+  .extra-item .ex-body { flex: 1; }
+  .extra-item .ex-body b { font-size: 14px; display: block; }
+  .extra-item .ex-body span { font-size: 12.5px; color: var(--slate); }
+  .extra-item .ex-price { font-weight: 700; font-size: 13.5px; white-space: nowrap; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 13.5px; padding: 8px 0; }
+  .summary-row.total { border-top: 1px solid var(--line-light); margin-top: 8px; padding-top: 14px; font-size: 16px; font-weight: 800; }
+  .step-nav { display: flex; justify-content: space-between; margin-top: 24px; gap: 10px; }
+  .confirm-box { text-align: center; padding: 40px 20px; }
+  .confirm-ref { font-size: 30px; font-weight: 800; letter-spacing: 1px; color: var(--primary); margin: 14px 0; }
+  .checklist-item { display: flex; gap: 10px; align-items: flex-start; text-align: right; font-size: 13.5px; padding: 10px 0; border-top: 1px solid var(--line-light); }
+  .checklist-item:first-child { border-top: none; }
+</style>
+</head>
+<body data-page="tours">
+<a class="skip-link" href="#main">გვერდის შემცველობაზე გადასვლა</a>
+<header class="site-header" id="site-header"></header>
+
+<main id="main">
+  <div id="wizard" style="display:none">
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <h1 class="display" style="font-size:26px;margin:0 0 24px">ჯავშნის დასრულება</h1>
+    <div class="steps" id="stepsIndicator"></div>
+
+    <div class="booking-layout">
+      <div>
+        <div class="step-panel active panel" data-step="1">
+          <h2 style="font-size:17px;margin:0 0 16px">საკონტაქტო ინფორმაცია</h2>
+          <div class="field-row">
+            <div class="field"><label for="contactName">სახელი და გვარი</label><input type="text" id="contactName" placeholder="მაგ. ნინო კარელი" /></div>
+            <div class="field"><label for="contactPhone">ტელეფონი</label><input type="tel" id="contactPhone" placeholder="+995 5XX XX XX XX" /></div>
+          </div>
+          <div class="field"><label for="contactEmail">ელფოსტა</label><input type="email" id="contactEmail" placeholder="name@example.com" /></div>
+          <div id="travelerFields"></div>
+          <div class="field"><label for="specialRequests">სპეციალური მოთხოვნები (არასავალდებულო)</label><textarea id="specialRequests" placeholder="დიეტური შეზღუდვები, ხელმისაწვდომობის საჭიროებები..."></textarea></div>
+        </div>
+
+        <div class="step-panel panel" data-step="2">
+          <h2 style="font-size:17px;margin:0 0 16px">დამატებითი სერვისები</h2>
+          <label class="extra-item"><input type="checkbox" id="exInsurance" /><div class="ex-body"><b>სამოგზაურო დაზღვევა</b><span>დაზღვევა უბედური შემთხვევის, დაზიანების ან გაუქმების შემთხვევაში</span></div><div class="ex-price">+15 ₾ / მოგზაურზე</div></label>
+          <label class="extra-item"><input type="checkbox" id="exTransfer" /><div class="ex-body"><b>აეროპორტის ტრანსფერი</b><span>მისვლა-წამოსვლა თბილისის აეროპორტიდან</span></div><div class="ex-price">+25 ₾</div></label>
+          <label class="extra-item"><input type="checkbox" id="exPhoto" /><div class="ex-body"><b>ფოტო-ვიდეო პაკეტი</b><span>პროფესიონალი ფოტოგრაფი ტურის განმავლობაში</span></div><div class="ex-price">+60 ₾</div></label>
+          <label class="extra-item"><input type="checkbox" id="exVeg" /><div class="ex-body"><b>ვეგეტარიანული მენიუ</b><span>ყველა ჩართული კვება ვეგეტარიანული იქნება</span></div><div class="ex-price">უფასო</div></label>
+        </div>
+
+        <div class="step-panel panel" data-step="3">
+          <h2 style="font-size:17px;margin:0 0 16px">მიმოხილვა და დადასტურება</h2>
+          <div id="reviewSummary"></div>
+          <label class="checkbox-row" style="margin-top:16px">
+            <input type="checkbox" id="agreeTerms" />
+            <span>ვეთანხმები <a href="terms.html" target="_blank" style="text-decoration:underline">მომსახურების პირობებსა</a> და <a href="cancellation.html" target="_blank" style="text-decoration:underline">გაუქმების პოლიტიკას</a></span>
+          </label>
+          <p class="field-hint" style="margin-top:10px">ეს დემო-ჯავშანია — რეალური გადახდა არ ხორციელდება. დადასტურების შემდეგ ჯავშანი შეინახება თქვენს ბრაუზერში.</p>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn btn-ghost" id="prevBtn">უკან</button>
+          <button class="btn btn-primary" id="nextBtn">შემდეგი</button>
+        </div>
+      </div>
+
+      <div class="panel" id="sideSummary"></div>
+    </div>
+  </div>
+
+  <div id="confirmWrap" style="display:none">
+    <div class="panel confirm-box" style="max-width:520px;margin:0 auto">
+      <div class="feat-icon" style="width:56px;height:56px;border-radius:50%;margin:0 auto"><svg class="icon" style="width:26px;height:26px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9.5 17.5 20 6"/></svg></div>
+      <h1 style="font-size:22px;margin:16px 0 4px">ჯავშანი დადასტურებულია!</h1>
+      <p style="color:var(--slate);font-size:14px">შეინახეთ თქვენი ჯავშნის ნომერი</p>
+      <div class="confirm-ref" id="confirmRef">—</div>
+      <div style="text-align:right;margin-top:10px">
+        <div class="checklist-item"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20l.8-3.6L16 5.2l3.4 3.4L8.2 20H4z"/></svg> ჯავშანი შენახულია თქვენს პროფილში ამ ბრაუზერზე</div>
+        <div class="checklist-item"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg> გიდი დაგიკავშირდებათ თარიღის საბოლოო დასადასტურებლად</div>
+        <div class="checklist-item"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/></svg> კითხვების შემთხვევაში მოგვწერეთ მხარდაჭერის გვერდიდან</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:24px">
+        <button class="btn btn-ghost" style="flex:1" onclick="window.print()">დაბეჭდვა</button>
+        <a class="btn btn-primary" style="flex:1" href="profile.html?tab=bookings">ჯავშნის ნახვა</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="notFound" style="display:none;text-align:center;padding:80px 24px">
+    <h1>ტური ვერ მოიძებნა</h1>
+    <p style="color:var(--slate);margin:10px 0 24px">დაბრუნდით კატალოგში და აირჩიეთ ტური თავიდან.</p>
+    <a class="btn btn-primary" href="tours.html">ტურების კატალოგი</a>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="layout.js"></script>
+<script>
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var tour = HT_DATA.getTourBySlug(params.get('slug') || '');
+    if (!tour) { document.getElementById('notFound').style.display = 'block'; return; }
+
+    var tier = params.get('tier') || 'basic';
+    var travelers = Math.max(1, Number(params.get('travelers')) || 1);
+    var date = params.get('date') || '';
+    var TIER_LABEL = { basic: 'საბაზისო', standard: 'სტანდარტი', premium: 'პრემიუმი' };
+    var dest = HT_DATA.getDestinationById(tour.destinationId);
+
+    document.getElementById('wizard').style.display = 'block';
+    document.getElementById('breadcrumb').innerHTML =
+      '<a href="index.html">მთავარი</a><span class="sep">/</span><a href="tour.html?slug=' + tour.slug + '">' + tour.title + '</a><span class="sep">/</span><span class="current">ჯავშანი</span>';
+
+    var travelerFields = document.getElementById('travelerFields');
+    for (var i = 1; i <= travelers; i++) {
+      var block = document.createElement('div');
+      block.className = 'traveler-block';
+      block.innerHTML = '<b>მოგზაური ' + i + '</b><input type="text" data-traveler placeholder="სახელი და გვარი" />';
+      travelerFields.appendChild(block);
+    }
+
+    var STEPS = ['საკონტაქტო ინფო', 'დამატებითი სერვისები', 'დადასტურება'];
+    var current = 1;
+
+    function renderSteps() {
+      var el = document.getElementById('stepsIndicator');
+      el.innerHTML = STEPS.map(function (label, idx) {
+        var n = idx + 1;
+        var cls = n === current ? 'active' : (n < current ? 'done' : '');
+        var html = '<div class="step ' + cls + '"><span class="num">' + (n < current ? '&check;' : n) + '</span><span class="label">' + label + '</span></div>';
+        if (n < STEPS.length) html += '<div class="step-sep"></div>';
+        return html;
+      }).join('');
+    }
+
+    function basePrice() { return HT_DATA.finalPrice(tour, tier); }
+    function extrasTotal() {
+      var t = 0;
+      if (document.getElementById('exInsurance').checked) t += 15 * travelers;
+      if (document.getElementById('exTransfer').checked) t += 25;
+      if (document.getElementById('exPhoto').checked) t += 60;
+      return t;
+    }
+    function grandTotal() { return basePrice() * travelers + extrasTotal(); }
+
+    function renderSideSummary() {
+      var side = document.getElementById('sideSummary');
+      side.innerHTML =
+        '<div class="card-loc">' + HT.icon('mapPin') + ' ' + (dest ? dest.name : '') + '</div>' +
+        '<h3 style="margin:6px 0 12px;font-size:16px">' + tour.title + '</h3>' +
+        '<div class="summary-row"><span>პაკეტი</span><span>' + TIER_LABEL[tier] + '</span></div>' +
+        '<div class="summary-row"><span>თარიღი</span><span>' + (date || 'შეთანხმებით') + '</span></div>' +
+        '<div class="summary-row"><span>მოგზაურები</span><span>' + travelers + '</span></div>' +
+        '<div class="summary-row"><span>ფასი 1 პიროვნებაზე</span><span>' + HT.formatGel(basePrice()) + '</span></div>' +
+        (extrasTotal() ? '<div class="summary-row"><span>დამატებითი სერვისები</span><span>' + HT.formatGel(extrasTotal()) + '</span></div>' : '') +
+        '<div class="summary-row total"><span>ჯამი</span><span>' + HT.formatGel(grandTotal()) + '</span></div>';
+    }
+
+    function renderReview() {
+      var names = Array.prototype.slice.call(document.querySelectorAll('[data-traveler]')).map(function (i) { return i.value || '—'; });
+      document.getElementById('reviewSummary').innerHTML =
+        '<div class="summary-row"><span>საკონტაქტო პირი</span><span>' + (document.getElementById('contactName').value || '—') + '</span></div>' +
+        '<div class="summary-row"><span>ელფოსტა</span><span>' + (document.getElementById('contactEmail').value || '—') + '</span></div>' +
+        '<div class="summary-row"><span>ტელეფონი</span><span>' + (document.getElementById('contactPhone').value || '—') + '</span></div>' +
+        '<div class="divider"></div>' +
+        '<div class="summary-row"><span>მოგზაურები</span><span>' + names.join(', ') + '</span></div>' +
+        '<div class="divider"></div>' +
+        '<div class="summary-row total"><span>ჯამური თანხა</span><span>' + HT.formatGel(grandTotal()) + '</span></div>';
+    }
+
+    ['exInsurance', 'exTransfer', 'exPhoto'].forEach(function (id) {
+      document.getElementById(id).addEventListener('change', renderSideSummary);
+    });
+
+    function goToStep(n) {
+      current = n;
+      document.querySelectorAll('.step-panel').forEach(function (p) { p.classList.toggle('active', Number(p.dataset.step) === n); });
+      document.getElementById('prevBtn').style.visibility = n === 1 ? 'hidden' : 'visible';
+      document.getElementById('nextBtn').textContent = n === STEPS.length ? 'ჯავშნის დადასტურება' : 'შემდეგი';
+      if (n === STEPS.length) renderReview();
+      renderSteps();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('prevBtn').addEventListener('click', function () { if (current > 1) goToStep(current - 1); });
+    document.getElementById('nextBtn').addEventListener('click', function () {
+      if (current === 1) {
+        var name = document.getElementById('contactName').value.trim();
+        var email = document.getElementById('contactEmail').value.trim();
+        if (!name || !email) { HT.toast('გთხოვთ შეავსოთ სახელი და ელფოსტა'); return; }
+      }
+      if (current < STEPS.length) { goToStep(current + 1); return; }
+      var agree = document.getElementById('agreeTerms').checked;
+      if (!agree) { HT.toast('გთხოვთ დაეთანხმოთ პირობებს'); return; }
+      submitBooking();
+    });
+
+    function submitBooking() {
+      var names = Array.prototype.slice.call(document.querySelectorAll('[data-traveler]')).map(function (i) { return i.value; });
+      var booking = HT_STORE.saveBooking({
+        tourId: tour.id, tourTitle: tour.title, tier: tier, travelers: travelers, date: date,
+        contactName: document.getElementById('contactName').value,
+        contactEmail: document.getElementById('contactEmail').value,
+        contactPhone: document.getElementById('contactPhone').value,
+        travelerNames: names,
+        specialRequests: document.getElementById('specialRequests').value,
+        extras: { insurance: document.getElementById('exInsurance').checked, transfer: document.getElementById('exTransfer').checked, photo: document.getElementById('exPhoto').checked, veg: document.getElementById('exVeg').checked },
+        total: grandTotal()
+      });
+      document.getElementById('wizard').style.display = 'none';
+      document.getElementById('confirmWrap').style.display = 'block';
+      document.getElementById('confirmRef').textContent = booking.reference;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    renderSteps();
+    renderSideSummary();
+  })();
+</script>
+</body>
+</html>

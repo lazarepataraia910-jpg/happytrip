@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ტურების შედარება — HappyTrip</title>
+<meta name="description" content="შეადარეთ ტურები ერთმანეთს — ფასი, ხანგრძლივობა, სირთულე და სხვა." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
+<script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .compare-wrap { overflow-x: auto; }
+  .compare-head-card { min-width: 220px; }
+  .compare-head-card .ph-media { aspect-ratio: 16/10; border-radius: 12px; margin-bottom: 10px; }
+  .compare-head-card h3 { font-size: 14.5px; margin: 0 0 4px; }
+  .compare-head-card .remove-btn { font-size: 12px; color: var(--danger); background: none; border: none; padding: 0; margin-top: 6px; }
+  .add-slot { min-width: 220px; border: 1.5px dashed var(--line-light); border-radius: 14px; display: flex; align-items: center; justify-content: center; padding: 20px; }
+</style>
+</head>
+<body data-page="compare">
+<a class="skip-link" href="#main">გვერდის შემცველობაზე გადასვლა</a>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="index.html">მთავარი</a><span class="sep">/</span><span class="current">შედარება</span></div>
+    <div class="eyebrow">გადაწყვეტილების მიღება</div>
+    <h1 class="display">შეადარეთ ტურები</h1>
+    <p>დაამატეთ ტურის გვერდიდან ან კატალოგიდან — მაქსიმუმ 3 ტური ერთდროულად.</p>
+  </div>
+</div>
+
+<main id="main">
+  <div id="compareContent"></div>
+  <div class="empty-state" id="compareEmpty">
+    <p>შედარებისთვის ჯერ ტური არ გაქვთ არჩეული</p>
+    <a class="btn btn-dark" href="tours.html">ტურების დათვალიერება</a>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="layout.js"></script>
+<script>
+  (function () {
+    var content = document.getElementById('compareContent');
+    var emptyState = document.getElementById('compareEmpty');
+
+    var ROWS = [
+      ['დანიშნულება', function (t) { var d = HT_DATA.getDestinationById(t.destinationId); return d ? d.name : '—'; }],
+      ['ტიპი', function (t) { return t.typeLabel; }],
+      ['ხანგრძლივობა', function (t) { return t.durationDays + ' დღე'; }],
+      ['სირთულე', function (t) { return t.difficultyLabel; }],
+      ['ჯგუფის ზომა', function (t) { return t.groupMin + '–' + t.groupMax; }],
+      ['რეიტინგი', function (t) { return t.rating + ' (' + t.reviewCount + ')'; }],
+      ['საბაზისო ფასი', function (t) { return HT.formatGel(HT_DATA.finalPrice(t, 'basic')); }],
+      ['სტანდარტი ფასი', function (t) { return HT.formatGel(HT_DATA.finalPrice(t, 'standard')); }],
+      ['პრემიუმ ფასი', function (t) { return HT.formatGel(HT_DATA.finalPrice(t, 'premium')); }],
+      ['რა შედის ფასში', function (t) { return t.inclusions.length + ' სერვისი'; }],
+      ['შეხვედრის წერტილი', function (t) { return t.meetingPoint; }]
+    ];
+
+    function render() {
+      var ids = HT_STORE.getCompareList();
+      var tours = ids.map(function (id) { return HT_DATA.getTourById(id); }).filter(Boolean);
+      emptyState.classList.toggle('show', tours.length === 0);
+      if (tours.length === 0) { content.innerHTML = ''; return; }
+
+      var headCards = tours.map(function (t) {
+        return '<div class="compare-head-card"><div class="ph-media ' + t.theme + '">' + HT.icon(t.icon) + '</div>' +
+          '<h3><a href="tour.html?slug=' + t.slug + '">' + t.title + '</a></h3>' +
+          '<a class="btn btn-primary btn-sm btn-block" href="tour.html?slug=' + t.slug + '">ნახვა</a>' +
+          '<button class="remove-btn" data-remove="' + t.id + '">ამოშლა შედარებიდან</button></div>';
+      }).join('');
+
+      var addSlot = tours.length < 3 ? '<div class="add-slot"><select id="addCompareSelect"><option value="">+ ტურის დამატება</option>' +
+        HT_DATA.getAllTours().filter(function (t) { return ids.indexOf(t.id) === -1; }).map(function (t) { return '<option value="' + t.id + '">' + t.title + '</option>'; }).join('') +
+        '</select></div>' : '';
+
+      var rowsHtml = ROWS.map(function (row) {
+        return '<tr><th>' + row[0] + '</th>' + tours.map(function (t) { return '<td>' + row[1](t) + '</td>'; }).join('') + '</tr>';
+      }).join('');
+
+      content.innerHTML =
+        '<div class="compare-wrap"><div style="display:flex;gap:16px;margin-bottom:20px">' + headCards + addSlot + '</div>' +
+        '<table class="compare-table"><tbody>' + rowsHtml + '</tbody></table></div>';
+
+      content.querySelectorAll('[data-remove]').forEach(function (btn) {
+        btn.addEventListener('click', function () { HT_STORE.toggleCompare(btn.dataset.remove); render(); });
+      });
+      var addSelect = document.getElementById('addCompareSelect');
+      if (addSelect) addSelect.addEventListener('change', function () {
+        if (addSelect.value) { HT_STORE.toggleCompare(addSelect.value); render(); }
+      });
+    }
+    render();
+  })();
+</script>
+</body>
+</html>

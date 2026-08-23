@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ხშირად დასმული კითხვები — HappyTrip</title>
+<meta name="description" content="პასუხები ყველაზე ხშირად დასმულ კითხვებზე ჯავშნის, გადახდის, გაუქმებისა და ტურების შესახებ." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
+<script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="faq">
+<a class="skip-link" href="#main">გვერდის შემცველობაზე გადასვლა</a>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="index.html">მთავარი</a><span class="sep">/</span><span class="current">კითხვები</span></div>
+    <div class="eyebrow">დახმარება</div>
+    <h1 class="display">ხშირად დასმული კითხვები</h1>
+    <p>ვერ პოულობთ პასუხს? მოგვწერეთ <a href="support.html" style="text-decoration:underline">მხარდაჭერის გვერდიდან</a>.</p>
+  </div>
+</div>
+
+<main id="main" style="max-width:800px">
+  <div style="position:relative;margin-bottom:20px">
+    <input type="text" id="faqSearch" placeholder="მოძებნეთ კითხვა..." />
+  </div>
+  <div class="accordion-cats" id="faqCats"></div>
+  <div id="faqList"></div>
+  <div class="empty-state" id="faqEmpty"><p>ამ ძებნით შედეგი ვერ მოიძებნა</p></div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="layout.js"></script>
+<script>
+  (function () {
+    var FAQS = [
+      { cat: 'ჯავშანი და გადახდა', q: 'როგორ დავჯავშნო ტური?', a: 'აირჩიეთ ტური, დააჭირეთ „დაჯავშნე ახლავე", შეავსეთ მოგზაურთა დეტალები და დაადასტურეთ. ჯავშნის ნომერს დაუყოვნებლივ მიიღებთ.' },
+      { cat: 'ჯავშანი და გადახდა', q: 'რა გადახდის მეთოდებია ხელმისაწვდომი?', a: 'მალე დაემატება საბანკო ბარათით და საბანკო გადარიცხვით გადახდა. ამჟამად საიტი დემო რეჟიმშია და რეალურ გადახდას არ ითხოვს.' },
+      { cat: 'ჯავშანი და გადახდა', q: 'შემიძლია დეპოზიტის გადახდა სრული თანხის ნაცვლად?', a: 'დიახ, უმეტეს ტურზე შესაძლებელია 30%-იანი დეპოზიტის გადახდა, დარჩენილი ნაწილი — ტურამდე 14 დღით ადრე.' },
+      { cat: 'ჯავშანი და გადახდა', q: 'ვღებულობ თუ არა ჯავშნის დამადასტურებელ დოკუმენტს?', a: 'დადასტურების შემდეგ ჯავშნის დეტალები ინახება თქვენს პროფილში, საიდანაც შეგიძლიათ დაბეჭდვა ან ეკრანის ანაბეჭდის შენახვა.' },
+      { cat: 'გაუქმება და ცვლილება', q: 'შემიძლია ჯავშნის გაუქმება?', a: 'დიახ, პროფილის „ჯავშნები" სექციიდან ნებისმიერ დროს შეგიძლიათ ჯავშნის გაუქმება. სრული პირობებისთვის იხილეთ გაუქმების პოლიტიკა.' },
+      { cat: 'გაუქმება და ცვლილება', q: 'შემიძლია თარიღის შეცვლა ჯავშნის შემდეგ?', a: 'დიახ, მოგზაურობამდე მინიმუმ 5 დღით ადრე მოთხოვნის შემთხვევაში, თანხის დამატებითი დაკისრების გარეშე.' },
+      { cat: 'გაუქმება და ცვლილება', q: 'რა ხდება ცუდი ამინდის შემთხვევაში?', a: 'უსაფრთხოებისთვის მარშრუტი შეიძლება შეიცვალოს ან გადაიდოს — ამის შესახებ წინასწარ დაგიკავშირდებით.' },
+      { cat: 'ტურამდე მზადება', q: 'რა ჩავალაგო ტურისთვის?', a: 'რეკომენდაცია დამოკიდებულია მარშრუტსა და სეზონზე — იხილეთ ბლოგის სტატია შეფუთვის შესახებ, ან ჰკითხეთ თქვენს გიდს ჯავშნის შემდეგ.' },
+      { cat: 'ტურამდე მზადება', q: 'საჭიროა თუ არა წინასწარი ფიზიკური მომზადება?', a: 'რთული სირთულის მარშრუტებზე (მაგ. თუშეთი, სვანეთი) გირჩევთ საშუალო ფიზიკურ ფორმას. თითოეული ტურის გვერდზე მითითებულია სირთულის დონე.' },
+      { cat: 'ტურამდე მზადება', q: 'შედის თუ არა სამოგზაურო დაზღვევა ფასში?', a: 'ჯავშნის დროს დაზღვევის დამატება შესაძლებელია დამატებით — თუ ტურის აღწერაში სხვაგვარად არ არის მითითებული.' },
+      { cat: 'ტურის დროს', q: 'რამდენი ადამიანია ჯგუფში?', a: 'ჯგუფის ზომა განსხვავდება ტურის მიხედვით — საშუალოდ 8-12 ადამიანი. ზუსტი დიაპაზონი მითითებულია თითოეული ტურის გვერდზე.' },
+      { cat: 'ტურის დროს', q: 'რომელ ენებზე მიმდინარეობს ტური?', a: 'უმეტესი ტური ხელმისაწვდომია ქართულ და ინგლისურ ენებზე, ზოგიერთი — რუსულადაც. დეტალები იხილეთ ტურის გვერდზე.' },
+      { cat: 'ტურის დროს', q: 'რა ხდება საგანგებო სიტუაციაში?', a: 'ყველა გიდს აქვს 24/7 საკონტაქტო ხაზთან წვდომა და პირველადი დახმარების მომზადება.' }
+    ];
+
+    var cats = ['ყველა'];
+    FAQS.forEach(function (f) { if (cats.indexOf(f.cat) === -1) cats.push(f.cat); });
+    var activeCat = 'ყველა';
+    var query = '';
+
+    var catsEl = document.getElementById('faqCats');
+    function renderCats() {
+      catsEl.innerHTML = '';
+      cats.forEach(function (c) {
+        var btn = document.createElement('button');
+        btn.className = 'accordion-cat' + (c === activeCat ? ' active' : '');
+        btn.type = 'button'; btn.textContent = c;
+        btn.addEventListener('click', function () { activeCat = c; renderCats(); renderList(); });
+        catsEl.appendChild(btn);
+      });
+    }
+
+    var listEl = document.getElementById('faqList');
+    function renderList() {
+      var list = FAQS.filter(function (f) {
+        var matchCat = activeCat === 'ყველა' || f.cat === activeCat;
+        var matchQ = !query || f.q.toLowerCase().indexOf(query) !== -1 || f.a.toLowerCase().indexOf(query) !== -1;
+        return matchCat && matchQ;
+      });
+      document.getElementById('faqEmpty').classList.toggle('show', list.length === 0);
+      listEl.innerHTML = list.map(function (f, i) {
+        return '<div class="accordion-item"><button class="accordion-q" data-acc>' + f.q + '<span class="chev">' + HT.icon('chevronDown') + '</span></button>' +
+          '<div class="accordion-a"><div class="accordion-a-inner">' + f.a + '</div></div></div>';
+      }).join('');
+      listEl.querySelectorAll('[data-acc]').forEach(function (btn) {
+        btn.addEventListener('click', function () { btn.closest('.accordion-item').classList.toggle('open'); });
+      });
+    }
+
+    document.getElementById('faqSearch').addEventListener('input', function (e) {
+      query = e.target.value.trim().toLowerCase();
+      renderList();
+    });
+
+    renderCats();
+    renderList();
+  })();
+</script>
+</body>
+</html>

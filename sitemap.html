@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>საიტის რუკა — HappyTrip</title>
+<meta name="description" content="HappyTrip-ის ყველა გვერდის სია." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
+<script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .sitemap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  @media (max-width: 700px) { .sitemap-grid { grid-template-columns: 1fr; } }
+  .sitemap-col h2 { font-size: 14px; margin: 0 0 14px; }
+  .sitemap-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .sitemap-col a { font-size: 13.5px; color: var(--text); }
+  .sitemap-col a:hover { color: var(--primary); }
+</style>
+</head>
+<body data-page="">
+<a class="skip-link" href="#main">გვერდის შემცველობაზე გადასვლა</a>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="index.html">მთავარი</a><span class="sep">/</span><span class="current">საიტის რუკა</span></div>
+    <h1 class="display">საიტის რუკა</h1>
+  </div>
+</div>
+
+<main id="main">
+  <div class="sitemap-grid">
+    <div class="sitemap-col">
+      <h2>მოგზაურობა</h2>
+      <ul>
+        <li><a href="index.html">მთავარი</a></li>
+        <li><a href="tours.html">ტურები</a></li>
+        <li><a href="destinations.html">დანიშნულებები</a></li>
+        <li><a href="compare.html">შედარება</a></li>
+        <li><a href="blog.html">ბლოგი</a></li>
+      </ul>
+    </div>
+    <div class="sitemap-col">
+      <h2>ანგარიში</h2>
+      <ul>
+        <li><a href="profile.html">ჩემი პროფილი</a></li>
+        <li><a href="profile.html?tab=bookings">ჯავშნები</a></li>
+        <li><a href="profile.html?tab=wishlist">რჩეულები</a></li>
+        <li><a href="admin.html">ადმინ პანელი</a></li>
+      </ul>
+    </div>
+    <div class="sitemap-col">
+      <h2>კომპანია</h2>
+      <ul>
+        <li><a href="about.html">ჩვენ შესახებ</a></li>
+        <li><a href="contact.html">კონტაქტი</a></li>
+        <li><a href="faq.html">ხშირად დასმული კითხვები</a></li>
+        <li><a href="support.html">მხარდაჭერა</a></li>
+      </ul>
+    </div>
+    <div class="sitemap-col">
+      <h2>სამართლებრივი</h2>
+      <ul>
+        <li><a href="terms.html">მომსახურების პირობები</a></li>
+        <li><a href="privacy.html">კონფიდენციალურობის პოლიტიკა</a></li>
+        <li><a href="cancellation.html">გაუქმების პოლიტიკა</a></li>
+      </ul>
+    </div>
+    <div class="sitemap-col" id="destColumn">
+      <h2>დანიშნულებები</h2>
+      <ul id="destList"></ul>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="layout.js"></script>
+<script>
+  (function () {
+    var list = document.getElementById('destList');
+    HT_DATA.getDestinations().forEach(function (d) {
+      var li = document.createElement('li');
+      li.innerHTML = '<a href="destination.html?slug=' + d.slug + '">' + d.name + '</a>';
+      list.appendChild(li);
+    });
+  })();
+</script>
+</body>
+</html>

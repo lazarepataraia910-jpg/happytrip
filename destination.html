@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title id="pageTitle">დანიშნულება — HappyTrip</title>
+<meta name="description" id="pageDesc" content="დანიშნულების დეტალები — HappyTrip" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
+<script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .dest-hero-media { aspect-ratio: 21/8; border-radius: 20px; margin-bottom: 24px; }
+  .dest-hero-media svg { max-width: 90px; }
+  .info-band { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 24px 0; }
+  .info-band .panel { padding: 18px; }
+  .info-band b { display: block; font-size: 12px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .hl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0 28px; }
+  .hl-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; padding: 12px; background: var(--surface); border: 1px solid var(--line-light); border-radius: 12px; }
+  .hl-item svg { color: var(--primary); flex-shrink: 0; margin-top: 1px; }
+  .tip-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; padding: 10px 0; color: var(--slate); }
+  .tip-item svg { color: var(--gold); flex-shrink: 0; margin-top: 2px; }
+</style>
+</head>
+<body data-page="destinations">
+<a class="skip-link" href="#main">გვერდის შემცველობაზე გადასვლა</a>
+<header class="site-header" id="site-header"></header>
+
+<main id="main">
+  <div class="breadcrumb" id="breadcrumb"></div>
+  <div id="content"></div>
+  <div id="notFound" style="display:none;text-align:center;padding:80px 24px">
+    <h1>დანიშნულება ვერ მოიძებნა</h1>
+    <p style="color:var(--slate);margin:10px 0 24px">იხილეთ ყველა დანიშნულება.</p>
+    <a class="btn btn-primary" href="destinations.html">ყველა დანიშნულება</a>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="layout.js"></script>
+<script>
+  (function () {
+    var slug = new URLSearchParams(window.location.search).get('slug');
+    var dest = slug ? HT_DATA.getDestinationBySlug(slug) : null;
+    if (!dest) { document.getElementById('notFound').style.display = 'block'; return; }
+
+    document.getElementById('pageTitle').textContent = dest.name + ' — HappyTrip';
+    document.getElementById('pageDesc').setAttribute('content', dest.tagline);
+    document.getElementById('breadcrumb').innerHTML =
+      '<a href="index.html">მთავარი</a><span class="sep">/</span><a href="destinations.html">დანიშნულებები</a><span class="sep">/</span><span class="current">' + dest.name + '</span>';
+
+    var relatedTours = HT_DATA.getTours({ destinationId: dest.id });
+
+    document.getElementById('content').innerHTML =
+      '<div class="ph-media dest-hero-media ' + dest.theme + '">' + HT.icon(dest.icon) + '</div>' +
+      '<div class="eyebrow">' + dest.region + '</div>' +
+      '<h1 class="display">' + dest.name + '</h1>' +
+      '<p style="font-size:15px;line-height:1.75;color:var(--text);max-width:760px;margin-top:14px">' + dest.description + '</p>' +
+      '<div class="info-band">' +
+        '<div class="panel"><b>საუკეთესო დრო ვიზიტისთვის</b>' + dest.bestTime + '</div>' +
+        '<div class="panel"><b>კლიმატი</b>' + dest.climate + '</div>' +
+      '</div>' +
+      '<div class="section-head"><div class="eyebrow">გამორჩეული</div><h2>რა უნდა ნახოთ</h2></div>' +
+      '<div class="hl-grid">' + dest.highlights.map(function (h) { return '<div class="hl-item">' + HT.icon('check') + ' ' + h + '</div>'; }).join('') + '</div>' +
+      '<div class="section-head"><div class="eyebrow">რჩევები</div><h2>სასარგებლო ინფორმაცია</h2></div>' +
+      '<div style="margin-bottom:28px">' + dest.tips.map(function (t) { return '<div class="tip-item">' + HT.icon('star') + ' ' + t + '</div>'; }).join('') + '</div>' +
+      (relatedTours.length ? '<div class="section-head"><div class="eyebrow">ტურები</div><h2>ტურები ' + dest.name + '-ში</h2></div><div class="grid grid-3" id="relatedGrid"></div>' :
+        '<div class="alert alert-info">ამ დანიშნულებისთვის ტურები მალე დაემატება — <a href="tours.html" style="text-decoration:underline">იხილეთ ყველა ტური</a>.</div>');
+
+    var relatedGrid = document.getElementById('relatedGrid');
+    if (relatedGrid) relatedTours.forEach(function (t) { relatedGrid.appendChild(HT.tourCard(t)); });
+  })();
+</script>
+</body>
+</html>

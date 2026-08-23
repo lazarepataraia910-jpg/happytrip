@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>მხარდაჭერა — HappyTrip</title>
+<meta name="description" content="დაგვიკავშირდით ტელეფონით, ელფოსტით ან შეავსეთ მხარდაჭერის ფორმა." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
+<script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .support-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 32px; align-items: flex-start; }
+  @media (max-width: 860px) { .support-layout { grid-template-columns: 1fr; } }
+  .channel-card { display: flex; gap: 14px; align-items: flex-start; padding: 18px; border: 1px solid var(--line-light); border-radius: 14px; margin-bottom: 12px; background: var(--surface); }
+  .channel-card h3 { margin: 0 0 4px; font-size: 14.5px; }
+  .channel-card p { margin: 0 0 8px; font-size: 12.5px; color: var(--slate); }
+  .channel-card a.link { font-size: 13px; font-weight: 700; color: var(--primary); }
+  .success-box { display: none; text-align: center; padding: 30px 10px; }
+</style>
+</head>
+<body data-page="support">
+<a class="skip-link" href="#main">გვერდის შემცველობაზე გადასვლა</a>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="index.html">მთავარი</a><span class="sep">/</span><span class="current">მხარდაჭერა</span></div>
+    <div class="eyebrow">დახმარება</div>
+    <h1 class="display">როგორ შეგვიძლია დაგეხმაროთ?</h1>
+    <p>საშუალო პასუხის დრო — 2 საათი სამუშაო დღეებში, 09:00–19:00.</p>
+  </div>
+</div>
+
+<main id="main">
+  <div class="support-layout">
+    <div>
+      <div class="channel-card"><div class="feat-icon" style="margin-bottom:0"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg></div>
+        <div><h3>ტელეფონი</h3><p>ორშაბათი–შაბათი, 09:00–19:00</p><a class="link" href="tel:+995555123456">+995 555 12 34 56</a></div></div>
+      <div class="channel-card"><div class="feat-icon" style="margin-bottom:0"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg></div>
+        <div><h3>ელფოსტა</h3><p>პასუხობთ 24 საათის განმავლობაში</p><a class="link" href="mailto:info@happytrip.ge">info@happytrip.ge</a></div></div>
+      <div class="channel-card"><div class="feat-icon" style="margin-bottom:0"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 0 0-7.8 13.4L3 21l4.7-1.2A9 9 0 1 0 12 3z"/></svg></div>
+        <div><h3>WhatsApp</h3><p>სწრაფი პასუხისთვის</p><a class="link" href="https://wa.me/995555123456" target="_blank" rel="noopener">+995 555 12 34 56</a></div></div>
+      <div class="alert alert-info" style="margin-top:20px">ხშირად დასმულ კითხვებზე პასუხი შეიძლება უკვე გქონდეთ — იხილეთ <a href="faq.html" style="text-decoration:underline">კითხვების გვერდი</a>.</div>
+    </div>
+
+    <div class="panel">
+      <div id="ticketForm">
+        <h2 style="font-size:17px;margin:0 0 16px">მხარდაჭერის ფორმა</h2>
+        <div class="field-row">
+          <div class="field"><label for="sName">სახელი</label><input type="text" id="sName" required /></div>
+          <div class="field"><label for="sEmail">ელფოსტა</label><input type="email" id="sEmail" required /></div>
+        </div>
+        <div class="field"><label for="sCategory">თემა</label>
+          <select id="sCategory">
+            <option value="ჯავშანი">ჯავშანთან დაკავშირებული</option>
+            <option value="გადახდა">გადახდა</option>
+            <option value="ტექნიკური">ტექნიკური პრობლემა</option>
+            <option value="სხვა">სხვა</option>
+          </select>
+        </div>
+        <div class="field"><label for="sMessage">შეტყობინება</label><textarea id="sMessage" required placeholder="აღწერეთ თქვენი საკითხი..."></textarea></div>
+        <button class="btn btn-primary btn-block" id="sSubmit">გაგზავნა</button>
+      </div>
+      <div class="success-box" id="ticketSuccess">
+        <div class="feat-icon" style="width:52px;height:52px;border-radius:50%;margin:0 auto"><svg class="icon" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 12 9.5 17.5 20 6"/></svg></div>
+        <h3 style="margin:14px 0 6px">მიღებულია!</h3>
+        <p style="color:var(--slate);font-size:13.5px;margin:0 0 6px">თქვენი მოთხოვნის ნომერია</p>
+        <p id="ticketRef" style="font-weight:800;font-size:18px;color:var(--primary)"></p>
+        <p style="color:var(--slate);font-size:12.5px">პასუხს მიიღებთ მითითებულ ელფოსტაზე.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="layout.js"></script>
+<script>
+  (function () {
+    document.getElementById('sSubmit').addEventListener('click', function () {
+      var name = document.getElementById('sName').value.trim();
+      var email = document.getElementById('sEmail').value.trim();
+      var message = document.getElementById('sMessage').value.trim();
+      if (!name || !email || !message) { HT.toast('გთხოვთ შეავსოთ ყველა ველი'); return; }
+      var ref = 'SUP-' + Math.random().toString(36).slice(2, 7).toUpperCase();
+      document.getElementById('ticketForm').style.display = 'none';
+      document.getElementById('ticketSuccess').style.display = 'block';
+      document.getElementById('ticketRef').textContent = ref;
+    });
+  })();
+</script>
+</body>
+</html>

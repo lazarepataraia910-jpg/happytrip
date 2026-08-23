@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title id="pageTitle">სტატია — HappyTrip</title>
+<meta name="description" id="pageDesc" content="HappyTrip ბლოგი" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
+<script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .post-hero-media { aspect-ratio: 21/9; border-radius: 20px; margin-bottom: 24px; }
+  .post-meta-row { display: flex; align-items: center; gap: 14px; color: var(--slate); font-size: 13px; margin: 14px 0 26px; flex-wrap: wrap; }
+  .post-body { max-width: 720px; font-size: 15.5px; line-height: 1.9; }
+  .post-body p { margin: 0 0 20px; }
+  .post-share { display: flex; gap: 8px; margin: 30px 0; }
+</style>
+</head>
+<body data-page="blog">
+<a class="skip-link" href="#main">გვერდის შემცველობაზე გადასვლა</a>
+<header class="site-header" id="site-header"></header>
+
+<main id="main">
+  <div class="breadcrumb" id="breadcrumb"></div>
+  <div id="content"></div>
+  <div id="notFound" style="display:none;text-align:center;padding:80px 24px">
+    <h1>სტატია ვერ მოიძებნა</h1>
+    <p style="color:var(--slate);margin:10px 0 24px">იხილეთ ყველა სტატია.</p>
+    <a class="btn btn-primary" href="blog.html">ბლოგზე დაბრუნება</a>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="layout.js"></script>
+<script>
+  (function () {
+    var slug = new URLSearchParams(window.location.search).get('slug');
+    var post = slug ? HT_DATA.getPostBySlug(slug) : null;
+    if (!post) { document.getElementById('notFound').style.display = 'block'; return; }
+
+    document.getElementById('pageTitle').textContent = post.title + ' — HappyTrip';
+    document.getElementById('pageDesc').setAttribute('content', post.excerpt);
+    document.getElementById('breadcrumb').innerHTML =
+      '<a href="index.html">მთავარი</a><span class="sep">/</span><a href="blog.html">ბლოგი</a><span class="sep">/</span><span class="current">' + post.title + '</span>';
+
+    var related = HT_DATA.getRelatedPosts(post, 3);
+
+    document.getElementById('content').innerHTML =
+      '<div class="ph-media post-hero-media ' + post.theme + '">' + HT.icon(post.icon) + '</div>' +
+      '<span class="tag">' + post.category + '</span>' +
+      '<h1 class="display" style="font-size:30px;margin:12px 0 0">' + post.title + '</h1>' +
+      '<div class="post-meta-row"><span>' + post.author + '</span><span>&middot;</span><span>' + post.publishedAt + '</span><span>&middot;</span><span>' + post.readMinutes + ' წუთის საკითხავი</span></div>' +
+      '<div class="post-body">' + post.content.map(function (p) { return '<p>' + p + '</p>'; }).join('') + '</div>' +
+      '<div class="post-share"><button class="btn btn-ghost btn-sm" id="shareBtn">' + HT.icon('share') + ' გაზიარება</button></div>' +
+      (related.length ? '<div class="section-head" style="margin-top:20px"><div class="eyebrow">მეტი საკითხავი</div><h2>დაკავშირებული სტატიები</h2></div><div class="grid grid-3" id="relatedGrid"></div>' : '');
+
+    document.getElementById('shareBtn').addEventListener('click', function () {
+      var url = window.location.href;
+      if (navigator.share) { navigator.share({ title: post.title, url: url }).catch(function () {}); return; }
+      if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { HT.toast('ბმული დაკოპირდა'); });
+    });
+
+    var relatedGrid = document.getElementById('relatedGrid');
+    if (relatedGrid) related.forEach(function (p) {
+      var el = document.createElement('a');
+      el.href = 'post.html?slug=' + p.slug;
+      el.className = 'card';
+      el.innerHTML = '<div class="card-media">' + HT.phMedia(p.theme, p.icon) + '</div><div class="card-body"><span class="tag" style="align-self:flex-start">' + p.category + '</span><h3 class="card-title">' + p.title + '</h3></div>';
+      relatedGrid.appendChild(el);
+    });
+  })();
+</script>
+</body>
+</html>

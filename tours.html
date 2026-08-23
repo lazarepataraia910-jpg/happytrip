@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ტურები საქართველოში — HappyTrip</title>
+<meta name="description" content="დაათვალიერეთ ყველა ტური საქართველოში — გაფილტრეთ დანიშნულების, ტიპის, ხანგრძლივობისა და ფასის მიხედვით." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
+<script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="tours">
+<a class="skip-link" href="#main">გვერდის შემცველობაზე გადასვლა</a>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="index.html">მთავარი</a><span class="sep">/</span><span class="current">ტურები</span></div>
+    <div class="eyebrow">კატალოგი</div>
+    <h1 class="display">ტურები საქართველოში</h1>
+    <p>გაფილტრეთ დანიშნულების, ტიპის, ხანგრძლივობისა და ბიუჯეტის მიხედვით — იპოვეთ ზუსტად ის, რასაც ეძებთ.</p>
+  </div>
+</div>
+
+<main id="main">
+  <div class="filters-bar">
+    <div class="filters-row">
+      <input type="text" id="fQ" placeholder="ძებნა სახელით ან დანიშნულებით..." />
+      <select id="fDestination"><option value="">ყველა დანიშნულება</option></select>
+      <select id="fType">
+        <option value="">ყველა ტიპი</option>
+        <option value="adventure">სათავგადასავლო</option>
+        <option value="cultural">კულტურული</option>
+        <option value="wine">ღვინის ტური</option>
+        <option value="family">საოჯახო</option>
+        <option value="luxury">ლუქსი</option>
+        <option value="daytrip">ერთდღიანი</option>
+        <option value="trekking">მთის ტრეკინგი</option>
+        <option value="seaside">ზღვისპირა</option>
+      </select>
+      <button id="filterToggle" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="11" cy="17" r="2"/></svg> მეტი ფილტრი</button>
+      <button id="resetFilters" type="button">გასუფთავება</button>
+    </div>
+    <div class="filters-extra" id="filtersExtra">
+      <select id="fDifficulty">
+        <option value="">ნებისმიერი სირთულე</option>
+        <option value="easy">ადვილი</option>
+        <option value="moderate">საშუალო</option>
+        <option value="hard">რთული</option>
+      </select>
+      <select id="fMaxPrice">
+        <option value="">ნებისმიერი ბიუჯეტი</option>
+        <option value="150">150 ₾-მდე</option>
+        <option value="400">400 ₾-მდე</option>
+        <option value="800">800 ₾-მდე</option>
+        <option value="2000">2000 ₾-მდე</option>
+      </select>
+      <select id="fDuration">
+        <option value="">ნებისმიერი ხანგრძლივობა</option>
+        <option value="1">1 დღე</option>
+        <option value="2-3">2–3 დღე</option>
+        <option value="4-99">4+ დღე</option>
+      </select>
+    </div>
+    <div class="filter-chips" id="filterChips"></div>
+  </div>
+
+  <div class="results-bar">
+    <div class="results-count"><b id="resultCount">0</b> ტური მოიძებნა</div>
+    <div class="sort-wrap">
+      <label for="sort" style="font-size:13px;color:var(--slate);font-weight:600">დალაგება:</label>
+      <select id="sort">
+        <option value="">პოპულარობით</option>
+        <option value="rating">რეიტინგით</option>
+        <option value="price-asc">ფასი: დაბლიდან მაღლა</option>
+        <option value="price-desc">ფასი: მაღლიდან დაბლა</option>
+        <option value="duration">ხანგრძლივობით</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid" id="toursGrid"></div>
+  <div class="empty-state" id="emptyState">
+    <p>ამ ფილტრებით ტური ვერ მოიძებნა</p>
+    <button class="btn btn-dark" id="emptyReset">ფილტრების გასუფთავება</button>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="layout.js"></script>
+<script>
+  (function () {
+    var destSelect = document.getElementById('fDestination');
+    HT_DATA.getDestinations().forEach(function (d) {
+      var opt = document.createElement('option');
+      opt.value = d.id; opt.textContent = d.name;
+      destSelect.appendChild(opt);
+    });
+
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('q')) document.getElementById('fQ').value = params.get('q');
+    if (params.get('destination')) destSelect.value = params.get('destination');
+    if (params.get('type')) document.getElementById('fType').value = params.get('type');
+
+    var filterToggleBtn = document.getElementById('filterToggle');
+    var filtersExtra = document.getElementById('filtersExtra');
+    filterToggleBtn.addEventListener('click', function () {
+      var show = filtersExtra.classList.toggle('show');
+      filterToggleBtn.classList.toggle('active', show);
+    });
+
+    function currentFilters() {
+      var f = {
+        q: document.getElementById('fQ').value,
+        destinationId: destSelect.value,
+        type: document.getElementById('fType').value,
+        difficulty: document.getElementById('fDifficulty').value,
+        sort: document.getElementById('sort').value
+      };
+      var maxPrice = document.getElementById('fMaxPrice').value;
+      if (maxPrice) f.maxPrice = Number(maxPrice);
+      var dur = document.getElementById('fDuration').value;
+      if (dur) {
+        var parts = dur.split('-');
+        f.minDays = Number(parts[0]); f.maxDays = Number(parts[1]);
+      }
+      return f;
+    }
+
+    var TYPE_LABELS = { adventure: 'სათავგადასავლო', cultural: 'კულტურული', wine: 'ღვინის ტური', family: 'საოჯახო', luxury: 'ლუქსი', daytrip: 'ერთდღიანი', trekking: 'მთის ტრეკინგი', seaside: 'ზღვისპირა' };
+    var DIFF_LABELS = { easy: 'ადვილი', moderate: 'საშუალო', hard: 'რთული' };
+
+    function renderChips(f) {
+      var wrap = document.getElementById('filterChips');
+      wrap.innerHTML = '';
+      var chips = [];
+      if (f.q) chips.push({ label: '"' + f.q + '"', clear: function () { document.getElementById('fQ').value = ''; } });
+      if (f.destinationId) { var d = HT_DATA.getDestinationById(f.destinationId); chips.push({ label: d ? d.name : '', clear: function () { destSelect.value = ''; } }); }
+      if (f.type) chips.push({ label: TYPE_LABELS[f.type], clear: function () { document.getElementById('fType').value = ''; } });
+      if (f.difficulty) chips.push({ label: DIFF_LABELS[f.difficulty], clear: function () { document.getElementById('fDifficulty').value = ''; } });
+      if (f.maxPrice) chips.push({ label: f.maxPrice + ' ₾-მდე', clear: function () { document.getElementById('fMaxPrice').value = ''; } });
+      if (f.minDays) chips.push({ label: document.getElementById('fDuration').selectedOptions[0].textContent, clear: function () { document.getElementById('fDuration').value = ''; } });
+      chips.forEach(function (c) {
+        var chip = document.createElement('span');
+        chip.className = 'filter-chip';
+        chip.innerHTML = c.label + ' ';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.innerHTML = HT.icon('x');
+        btn.addEventListener('click', function () { c.clear(); render(); });
+        chip.appendChild(btn);
+        wrap.appendChild(chip);
+      });
+    }
+
+    function render() {
+      var f = currentFilters();
+      var results = HT_DATA.getTours(f);
+      var grid = document.getElementById('toursGrid');
+      grid.innerHTML = '';
+      results.forEach(function (t) { grid.appendChild(HT.tourCard(t, { showCompare: true })); });
+      document.getElementById('resultCount').textContent = results.length;
+      document.getElementById('emptyState').classList.toggle('show', results.length === 0);
+      grid.style.display = results.length === 0 ? 'none' : '';
+      renderChips(f);
+    }
+
+    ['fQ', 'fDestination', 'fType', 'fDifficulty', 'fMaxPrice', 'fDuration', 'sort'].forEach(function (id) {
+      var el = document.getElementById(id);
+      el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', render);
+    });
+    function resetAll() {
+      document.getElementById('fQ').value = '';
+      destSelect.value = ''; document.getElementById('fType').value = '';
+      document.getElementById('fDifficulty').value = ''; document.getElementById('fMaxPrice').value = '';
+      document.getElementById('fDuration').value = ''; document.getElementById('sort').value = '';
+      render();
+    }
+    document.getElementById('resetFilters').addEventListener('click', resetAll);
+    document.getElementById('emptyReset').addEventListener('click', resetAll);
+
+    render();
+  })();
+</script>
+</body>
+</html>

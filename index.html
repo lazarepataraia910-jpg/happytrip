@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HappyTrip — აღმოაჩინეთ საქართველო</title>
+<meta name="description" content="HappyTrip — ტურები საქართველოში: მთა, ზღვა, ღვინის მარშრუტები და კულტურული მოგზაურობები ადგილობრივ გიდებთან ერთად." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
+<script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .cat-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .cat-pill { padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.16); color: rgba(255,255,255,0.85); font-size: 13px; font-weight: 600; }
+  .cat-pill:hover { border-color: var(--primary); color: #fff; }
+  .dest-card { position: relative; border-radius: 16px; overflow: hidden; aspect-ratio: 3/3.6; display: flex; align-items: flex-end; }
+  .dest-card .ph-media { position: absolute; inset: 0; }
+  .dest-card .dest-info { position: relative; z-index: 2; padding: 18px; color: #fff; background: linear-gradient(0deg, rgba(0,0,0,0.55), transparent 70%); width: 100%; }
+  .dest-card .dest-info b { font-size: 16px; display: block; }
+  .dest-card .dest-info span { font-size: 12px; opacity: 0.85; }
+  .newsletter-band { background: var(--forest); color: #fff; border-radius: 24px; padding: 48px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .newsletter-band h2 { font-size: 24px; margin: 0 0 8px; }
+  .newsletter-band p { margin: 0; color: rgba(255,255,255,0.75); font-size: 14px; max-width: 420px; }
+  .newsletter-band form { display: flex; gap: 8px; flex: 1 1 320px; max-width: 420px; }
+  .newsletter-band input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; }
+  .newsletter-band input::placeholder { color: rgba(255,255,255,0.55); }
+  .newsletter-band .ok-msg { display: none; margin-top: 8px; color: var(--gold); font-size: 13px; }
+  .blog-mini-card { display: flex; flex-direction: column; }
+  .blog-mini-card .card-media { aspect-ratio: 16/10; }
+</style>
+</head>
+<body data-page="home">
+<a class="skip-link" href="#main">გვერდის შემცველობაზე გადასვლა</a>
+<header class="site-header" id="site-header"></header>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">მოგზაურობა საქართველოში</div>
+    <h1 class="display">აღმოაჩინეთ საქართველოს ყველა სახე</h1>
+    <p class="subtitle">მთიდან ზღვამდე, ძველი ციხე-სიმაგრეებიდან თანამედროვე ღვინის მარნებამდე — HappyTrip გეხმარებათ იპოვოთ ტური, რომელიც ნამდვილად თქვენია.</p>
+
+    <div class="search-panel">
+      <form id="heroSearchForm">
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <span class="icon" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.45)">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+            </span>
+            <input type="text" id="heroQ" placeholder="საით მოგზაურობთ? მაგ. ყაზბეგი, ღვინის ტური..." />
+          </div>
+          <select id="heroDestination"><option value="">ყველა დანიშნულება</option></select>
+          <input type="number" id="heroTravelers" min="1" placeholder="მოგზაურთა რაოდენობა" style="max-width:200px" />
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">ტურის ძებნა</button>
+      </form>
+      <div class="cat-pills">
+        <a class="cat-pill" href="tours.html?type=adventure">სათავგადასავლო</a>
+        <a class="cat-pill" href="tours.html?type=cultural">კულტურული</a>
+        <a class="cat-pill" href="tours.html?type=wine">ღვინის ტური</a>
+        <a class="cat-pill" href="tours.html?type=family">საოჯახო</a>
+        <a class="cat-pill" href="tours.html?type=luxury">ლუქსი</a>
+        <a class="cat-pill" href="tours.html?type=trekking">მთის ტრეკინგი</a>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><b>12,400+</b><span>კმაყოფილი მოგზაური</span></div>
+      <div class="stat"><b>9</b><span>დაფარული რეგიონი</span></div>
+      <div class="stat"><b>4.8/5</b><span>საშუალო შეფასება</span></div>
+      <div class="stat"><b>11</b><span>წლიანი გამოცდილება</span></div>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+
+  <section class="section" style="padding-top:0;margin-top:56px">
+    <div class="section-row">
+      <div class="section-head">
+        <div class="eyebrow">დანიშნულებები</div>
+        <h2>პოპულარული მიმართულებები</h2>
+        <p>ცხრა რეგიონი, თითოეული საკუთარი ხასიათით — აირჩიეთ საწყისი წერტილი თქვენი მოგზაურობისთვის.</p>
+      </div>
+      <a class="btn btn-ghost" href="destinations.html">ყველა დანიშნულება &rarr;</a>
+    </div>
+    <div class="grid grid-4" id="destGrid"></div>
+  </section>
+
+  <section class="section alt">
+    <div class="wrap">
+      <div class="section-row">
+        <div class="section-head">
+          <div class="eyebrow">რჩეული</div>
+          <h2>გამორჩეული ტურები</h2>
+          <p>ჩვენი მოგზაურების ყველაზე მაღალი შეფასების მქონე მარშრუტები.</p>
+        </div>
+        <a class="btn btn-ghost" href="tours.html">ყველა ტური</a>
+      </div>
+      <div class="grid grid-3" id="featuredGrid"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head center" style="margin-left:auto;margin-right:auto;text-align:center">
+      <div class="eyebrow" style="justify-content:center">რატომ HappyTrip</div>
+      <h2>დაგეგმეთ მშვიდად, იმოგზაურეთ თავისუფლად</h2>
+      <p>11 წელია ვქმნით მოგზაურობებს საქართველოს გარშემო — აქ არის, რატომ გვენდობიან.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l8 3.2v6c0 5.2-3.4 8.7-8 9.8-4.6-1.1-8-4.6-8-9.8v-6z"/><polyline points="8.5 12 11 14.5 15.5 9.5"/></svg></div><h3>ლიცენზირებული გიდები</h3><p>ყველა გიდი სერტიფიცირებულია და საუბრობს მინიმუმ ორ ენაზე.</p></div>
+      <div class="feat-card"><div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8" r="3"/><path d="M2.5 21v-1.2A5.8 5.8 0 0 1 8.3 14h.4a5.8 5.8 0 0 1 5.8 5.8V21"/><circle cx="17" cy="8.5" r="2.4"/><path d="M15 14.2c2.8.3 5 2.6 5 5.6V21"/></svg></div><h3>მცირე ჯგუფები</h3><p>საშუალოდ 8-12 ადამიანი ჯგუფში — მეტი ყურადღება, ნაკლები ჩქარობა.</p></div>
+      <div class="feat-card"><div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="5.5"/><polyline points="8.5 13.5 7 21 12 18.5 17 21 15.5 13.5"/></svg></div><h3>საუკეთესო ფასის გარანტია</h3><p>გამჭვირვალე ფასები დამალული საკომისიოების გარეშე.</p></div>
+      <div class="feat-card"><div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/><path d="M19 19v1a3 3 0 0 1-3 3h-3"/></svg></div><h3>მხარდაჭერა მოგზაურობის დროს</h3><p>საკონტაქტო ხაზი ტურის განმავლობაში, არა მხოლოდ ჯავშნამდე.</p></div>
+    </div>
+  </section>
+
+  <section class="section alt">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">გამოხმაურებები</div>
+        <h2>რას ამბობენ ჩვენი მოგზაურები</h2>
+      </div>
+      <div class="tstm-track" id="tstmTrack"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-row">
+      <div class="section-head">
+        <div class="eyebrow">ბლოგი</div>
+        <h2>რჩევები და შთაგონება</h2>
+      </div>
+      <a class="btn btn-ghost" href="blog.html">ყველა სტატია</a>
+    </div>
+    <div class="grid grid-3" id="blogGrid"></div>
+  </section>
+
+  <section class="section tight">
+    <div class="newsletter-band">
+      <div>
+        <h2>გამოიწერეთ სამოგზაურო შთაგონება</h2>
+        <p>ახალი მარშრუტები, სეზონური შეთავაზებები და რჩევები — ყოველთვიურად, ერთი ელფოსტით.</p>
+      </div>
+      <div>
+        <form id="homeNewsletterForm">
+          <input type="email" placeholder="თქვენი ელფოსტა" required />
+          <button class="btn btn-primary" type="submit">გამოწერა</button>
+        </form>
+        <p class="ok-msg" id="homeNewsletterOk">გმადლობთ! მალე მიიღებთ პირველ წერილს.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="layout.js"></script>
+<script>
+  (function () {
+    var destSelect = document.getElementById('heroDestination');
+    HT_DATA.getDestinations().forEach(function (d) {
+      var opt = document.createElement('option');
+      opt.value = d.id; opt.textContent = d.name;
+      destSelect.appendChild(opt);
+    });
+
+    document.getElementById('heroSearchForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var params = new URLSearchParams();
+      var q = document.getElementById('heroQ').value.trim();
+      var destId = destSelect.value;
+      if (q) params.set('q', q);
+      if (destId) params.set('destination', destId);
+      window.location.href = 'tours.html' + (params.toString() ? '?' + params.toString() : '');
+    });
+
+    var destGrid = document.getElementById('destGrid');
+    HT_DATA.getDestinations().slice(0, 8).forEach(function (d) {
+      var el = document.createElement('a');
+      el.href = 'destination.html?slug=' + d.slug;
+      el.className = 'dest-card';
+      el.innerHTML = HT.phMedia(d.theme, d.icon) + '<div class="dest-info"><b>' + d.name + '</b><span>' + d.region + '</span></div>';
+      destGrid.appendChild(el);
+    });
+
+    var featuredGrid = document.getElementById('featuredGrid');
+    HT_DATA.getFeaturedTours(6).forEach(function (t) { featuredGrid.appendChild(HT.tourCard(t)); });
+
+    var tstmTrack = document.getElementById('tstmTrack');
+    var picks = [];
+    HT_DATA.tours.forEach(function (t) { t.reviews.forEach(function (r) { picks.push({ r: r, tourTitle: t.title }); }); });
+    picks.sort(function () { return Math.random() - 0.5; });
+    picks.slice(0, 8).forEach(function (p) {
+      var el = document.createElement('div');
+      el.className = 'tstm-card';
+      el.innerHTML = '<div class="tstm-stars">' + HT.starsHtml(p.r.rating) + '</div>' +
+        '<p class="tstm-quote">&laquo;' + p.r.text + '&raquo;</p>' +
+        '<div class="tstm-person"><div class="tstm-avatar">' + p.r.initials + '</div><div><b>' + p.r.name + '</b><span>' + p.tourTitle + '</span></div></div>';
+      tstmTrack.appendChild(el);
+    });
+
+    var blogGrid = document.getElementById('blogGrid');
+    HT_DATA.getBlogPosts().slice(0, 3).forEach(function (post) {
+      var el = document.createElement('a');
+      el.href = 'post.html?slug=' + post.slug;
+      el.className = 'card blog-mini-card';
+      el.innerHTML = '<div class="card-media">' + HT.phMedia(post.theme, post.icon) + '</div>' +
+        '<div class="card-body"><span class="tag">' + post.category + '</span><h3 class="card-title">' + post.title + '</h3>' +
+        '<div class="card-meta">' + post.readMinutes + ' წუთის საკითხავი</div></div>';
+      blogGrid.appendChild(el);
+    });
+
+    function wireNewsletter(formId, okId) {
+      var form = document.getElementById(formId);
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var input = form.querySelector('input');
+        HT_STORE.subscribeNewsletter(input.value.trim());
+        document.getElementById(okId).style.display = 'block';
+        form.reset();
+      });
+    }
+    wireNewsletter('homeNewsletterForm', 'homeNewsletterOk');
+  })();
+</script>
+</body>
+</html>
