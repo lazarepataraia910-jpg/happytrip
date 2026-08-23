@@ -124,13 +124,18 @@
     var gate = document.getElementById('gate');
     var dashboard = document.getElementById('dashboard');
     var DEMO_PASSWORD = 'trl123';
+    var ADMIN_EMAILS = ['lazarepataraia910@gmail.com', 'irineirnola@gmail.com'];
 
     function showDashboard() {
       gate.style.display = 'none';
       dashboard.style.display = 'block';
       renderAll();
     }
-    if (HT_STORE.isAdminSession()) showDashboard();
+    function isAllowlistedEmail() {
+      var profile = HT_STORE.getProfile();
+      return !!(profile && profile.provider === 'google' && ADMIN_EMAILS.indexOf(profile.email) !== -1);
+    }
+    if (isAllowlistedEmail() || HT_STORE.isAdminSession()) showDashboard();
 
     document.getElementById('gateBtn').addEventListener('click', tryLogin);
     document.getElementById('gatePassword').addEventListener('keydown', function (e) {
