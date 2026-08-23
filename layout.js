@@ -1,4 +1,6 @@
 (function () {
+  var GOOGLE_CLIENT_ID = '391522755035-1gfti97mp8alko87gtmlagh83qnqb3ic.apps.googleusercontent.com';
+
   var ICONS = {
     search: '<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>',
     filter: '<line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="11" cy="17" r="2"/>',
@@ -174,7 +176,10 @@
     var profile = window.HT_STORE.getProfile();
     if (profile) {
       var initial = (profile.name || '?').trim().charAt(0).toUpperCase();
-      slot.innerHTML = '<a href="profile.html" class="auth-chip auth-avatar-only" title="' + profile.name + '" aria-label="' + profile.name + '"><span class="auth-avatar-fallback">' + initial + '</span></a>';
+      var avatarInner = profile.picture
+        ? '<img src="' + profile.picture + '" alt="" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;display:block" />'
+        : '<span class="auth-avatar-fallback">' + initial + '</span>';
+      slot.innerHTML = '<a href="profile.html" class="auth-chip auth-avatar-only" title="' + profile.name + '" aria-label="' + profile.name + '">' + avatarInner + '</a>';
     } else {
       slot.innerHTML = '<button type="button" class="auth-chip auth-login-btn" id="htLoginBtn">შესვლა</button>';
       var btn = document.getElementById('htLoginBtn');
@@ -184,15 +189,17 @@
 
   function openLoginModal() {
     var overlay = document.getElementById('htLoginModal');
-    if (overlay) { overlay.classList.add('open'); return; }
+    if (overlay) { overlay.classList.add('open'); renderGoogleButton(); return; }
     overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.id = 'htLoginModal';
     overlay.innerHTML =
       '<div class="modal-box">' +
         '<h3>მოგესალმებით!</h3>' +
-        '<p class="hint">დატოვეთ თქვენი სახელი, რომ შევძლოთ ჯავშნების და რჩეულების შენახვა ამ ბრაუზერში. ეს არ არის სრული ავტორიზაცია — მალე დაემატება ანგარიშის სისტემა.</p>' +
-        '<div class="field"><label for="htLoginName">სახელი</label><input type="text" id="htLoginName" placeholder="მაგ. ნინო კარელი" /></div>' +
+        '<p class="hint">შედით Google ანგარიშით, ან შეიყვანეთ სახელი ხელით — ორივე ინახება მხოლოდ ამ ბრაუზერში, არა სერვერზე.</p>' +
+        '<div id="googleBtnSlot" style="display:flex;justify-content:center;min-height:44px;margin-bottom:16px"></div>' +
+        '<div class="divider" style="margin:0 0 16px"></div>' +
+        '<div class="field"><label for="htLoginName">სახელი (ხელით)</label><input type="text" id="htLoginName" placeholder="მაგ. ნინო კარელი" /></div>' +
         '<div style="display:flex;gap:8px;margin-top:6px">' +
           '<button class="btn btn-ghost" type="button" id="htLoginCancel" style="flex:1">გაუქმება</button>' +
           '<button class="btn btn-primary" type="button" id="htLoginSave" style="flex:1">შენახვა</button>' +
@@ -212,6 +219,56 @@
       toast('კეთილი იყოს თქვენი მობრძანება, ' + name + '!');
     });
     overlay.classList.add('open');
+    renderGoogleButton();
+  }
+
+  function loadGoogleScript(cb) {
+    if (window.google && window.google.accounts && window.google.accounts.id) { cb(); return; }
+    var existing = document.getElementById('googleGsiScript');
+    if (existing) { existing.addEventListener('load', cb); return; }
+    var s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.async = true; s.defer = true; s.id = 'googleGsiScript';
+    s.onload = cb;
+    document.head.appendChild(s);
+  }
+
+  function decodeJwt(token) {
+    try {
+      var payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      var json = decodeURIComponent(atob(payload).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(json);
+    } catch (e) { return null; }
+  }
+
+  function handleGoogleCredential(response) {
+    var data = decodeJwt(response.credential);
+    if (!data) { toast('Google შესვლა ვერ მოხერხდა'); return; }
+    window.HT_STORE.setProfile({
+      name: data.name || data.email, email: data.email, picture: data.picture,
+      provider: 'google', joinedAt: new Date().toISOString()
+    });
+    var overlay = document.getElementById('htLoginModal');
+    if (overlay) overlay.classList.remove('open');
+    renderAuthSlot();
+    updateWishCount();
+    toast('კეთილი იყოს თქვენი მობრძანება, ' + (data.name || '') + '!');
+  }
+
+  function renderGoogleButton() {
+    loadGoogleScript(function () {
+      var slot = document.getElementById('googleBtnSlot');
+      if (!slot) return;
+      slot.innerHTML = '';
+      try {
+        google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+        google.accounts.id.renderButton(slot, { theme: 'outline', size: 'large', shape: 'pill', text: 'continue_with', locale: 'ka' });
+      } catch (e) {
+        slot.innerHTML = '<p style="font-size:12.5px;color:var(--slate)">Google შესვლა ამჟამად მიუწვდომელია</p>';
+      }
+    });
   }
 
   function updateWishCount() {

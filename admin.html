@@ -26,7 +26,7 @@
       <div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
       <h1>ადმინისტრატორის შესვლა</h1>
       <p>ეს არის დემო-გვერდის დაცვა კლიენტის მხარეს — არა რეალური ავტორიზაციის სისტემა.</p>
-      <div class="field"><input type="password" id="gatePassword" placeholder="პაროლი (მინიშნება: admin123)" /></div>
+      <div class="field"><input type="password" id="gatePassword" placeholder="პაროლი (მინიშნება: trl123)" /></div>
       <button class="btn btn-primary btn-block" id="gateBtn">შესვლა</button>
     </div>
   </div>
@@ -123,7 +123,7 @@
   (function () {
     var gate = document.getElementById('gate');
     var dashboard = document.getElementById('dashboard');
-    var DEMO_PASSWORD = 'admin123';
+    var DEMO_PASSWORD = 'trl123';
 
     function showDashboard() {
       gate.style.display = 'none';
@@ -133,7 +133,9 @@
     if (HT_STORE.isAdminSession()) showDashboard();
 
     document.getElementById('gateBtn').addEventListener('click', tryLogin);
-    document.getElementById('gatePassword').addEventListener('keydown', function (e) { if (e.key === 'Enter') tryLogin(); });
+    document.getElementById('gatePassword').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.code === 'Space') { e.preventDefault(); tryLogin(); }
+    });
     function tryLogin() {
       var val = document.getElementById('gatePassword').value;
       if (val === DEMO_PASSWORD) { HT_STORE.setAdminSession(true); showDashboard(); }

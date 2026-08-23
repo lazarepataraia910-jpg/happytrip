@@ -55,6 +55,7 @@
 
   <div class="tab-panel" data-panel="settings">
     <div class="panel" style="max-width:440px">
+      <div class="alert alert-info" id="googleAccountNote" style="display:none;margin-bottom:16px"></div>
       <h3 style="margin:0 0 14px;font-size:15px">სახელი</h3>
       <div class="field"><input type="text" id="nameInput" placeholder="თქვენი სახელი" /></div>
       <button class="btn btn-primary" id="saveNameBtn">შენახვა</button>
@@ -65,7 +66,7 @@
         <div class="theme-opt" data-theme-opt="dark"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>მუქი</div>
       </div>
       <div class="divider"></div>
-      <button class="btn btn-ghost btn-block" id="clearProfileBtn">ანგარიშის სახელის წაშლა</button>
+      <button class="btn btn-ghost btn-block" id="clearProfileBtn">გამოსვლა</button>
     </div>
   </div>
 </main>
@@ -81,6 +82,11 @@
     var profile = HT_STORE.getProfile();
     document.getElementById('profileGreeting').textContent = profile ? 'გამარჯობა, ' + profile.name : 'სტუმარი';
     document.getElementById('nameInput').value = profile ? profile.name : '';
+    var googleNote = document.getElementById('googleAccountNote');
+    if (profile && profile.provider === 'google') {
+      googleNote.style.display = 'flex';
+      googleNote.textContent = 'შესული ხართ Google ანგარიშით (' + profile.email + '). სახელის შეცვლა ამ გვერდზე მხოლოდ ამ საიტზე გამოჩენას შეცვლის.';
+    }
 
     var tabs = document.querySelectorAll('#profileTabs .tab-btn');
     var panels = document.querySelectorAll('.tab-panel');
@@ -134,17 +140,20 @@
     document.getElementById('saveNameBtn').addEventListener('click', function () {
       var name = document.getElementById('nameInput').value.trim();
       if (!name) { HT.toast('შეიყვანეთ სახელი'); return; }
-      HT_STORE.setProfile({ name: name, joinedAt: (profile && profile.joinedAt) || new Date().toISOString() });
+      HT_STORE.setProfile(Object.assign({}, profile, { name: name, joinedAt: (profile && profile.joinedAt) || new Date().toISOString() }));
+      profile = HT_STORE.getProfile();
       HT.renderAuthSlot();
       document.getElementById('profileGreeting').textContent = 'გამარჯობა, ' + name;
       HT.toast('შენახულია');
     });
     document.getElementById('clearProfileBtn').addEventListener('click', function () {
       HT_STORE.clearProfile();
+      profile = null;
       HT.renderAuthSlot();
       document.getElementById('nameInput').value = '';
       document.getElementById('profileGreeting').textContent = 'სტუმარი';
-      HT.toast('სახელი წაიშალა');
+      googleNote.style.display = 'none';
+      HT.toast('გამოხვედით სისტემიდან');
     });
 
     var themeOpts = document.querySelectorAll('[data-theme-opt]');
