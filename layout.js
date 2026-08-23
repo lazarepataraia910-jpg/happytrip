@@ -66,7 +66,7 @@
     return Math.round(n).toLocaleString('ka-GE') + ' ₾';
   }
 
-  function toast(msg) {
+  function toast(msg, duration) {
     var wrap = document.querySelector('.toast-wrap');
     if (!wrap) {
       wrap = document.createElement('div');
@@ -76,12 +76,16 @@
     var el = document.createElement('div');
     el.className = 'toast';
     el.textContent = msg;
+    el.style.cursor = 'pointer';
+    el.title = 'დახურვისთვის დააჭირეთ';
     wrap.appendChild(el);
     requestAnimationFrame(function () { el.classList.add('show'); });
-    setTimeout(function () {
+    var hide = function () {
       el.classList.remove('show');
       setTimeout(function () { el.remove(); }, 250);
-    }, 2400);
+    };
+    var timer = setTimeout(hide, duration || 2400);
+    el.addEventListener('click', function () { clearTimeout(timer); hide(); });
   }
 
   var NAV_LINKS = [
@@ -265,11 +269,13 @@
       }).then(function (res) {
         if (res.error) {
           console.warn('Supabase sign-in failed:', res.error.message);
-          setTimeout(function () { toast('Supabase სესია ვერ დამყარდა: ' + res.error.message); }, 1500);
+          setTimeout(function () { toast('DIAGNOSTIKA: Supabase სესია ვერ დამყარდა — ' + res.error.message, 20000); }, 1500);
+        } else {
+          setTimeout(function () { toast('DIAGNOSTIKA: Supabase სესია წარმატებით დამყარდა', 20000); }, 1500);
         }
       }).catch(function (err) {
         console.warn('Supabase sign-in failed:', err);
-        setTimeout(function () { toast('Supabase სესია ვერ დამყარდა: ' + (err && err.message ? err.message : err)); }, 1500);
+        setTimeout(function () { toast('DIAGNOSTIKA: Supabase სესია ვერ დამყარდა — ' + (err && err.message ? err.message : err), 20000); }, 1500);
       });
     }
   }
