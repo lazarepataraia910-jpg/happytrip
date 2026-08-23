@@ -33,6 +33,9 @@ $$;
 drop policy if exists "Public insert access" on public.destinations;
 drop policy if exists "Public update access" on public.destinations;
 drop policy if exists "Public delete access" on public.destinations;
+drop policy if exists "Admin insert access" on public.destinations;
+drop policy if exists "Admin update access" on public.destinations;
+drop policy if exists "Admin delete access" on public.destinations;
 
 create policy "Admin insert access" on public.destinations for insert with check (public.is_admin_user());
 create policy "Admin update access" on public.destinations for update using (public.is_admin_user()) with check (public.is_admin_user());
@@ -42,6 +45,9 @@ create policy "Admin delete access" on public.destinations for delete using (pub
 drop policy if exists "Public insert access" on public.tours;
 drop policy if exists "Public update access" on public.tours;
 drop policy if exists "Public delete access" on public.tours;
+drop policy if exists "Admin insert access" on public.tours;
+drop policy if exists "Admin update access" on public.tours;
+drop policy if exists "Admin delete access" on public.tours;
 
 create policy "Admin insert access" on public.tours for insert with check (public.is_admin_user());
 create policy "Admin update access" on public.tours for update using (public.is_admin_user()) with check (public.is_admin_user());
@@ -51,11 +57,14 @@ create policy "Admin delete access" on public.tours for delete using (public.is_
 -- Insert stays public (a future "leave a review" feature shouldn't require
 -- admin login) - just add moderation delete for admins, which didn't exist
 -- before.
+drop policy if exists "Admin delete access" on public.reviews;
 create policy "Admin delete access" on public.reviews for delete using (public.is_admin_user());
 
 -- ---------- Blog posts ----------
 drop policy if exists "Public insert access" on public.blog_posts;
 drop policy if exists "Public update access" on public.blog_posts;
+drop policy if exists "Admin insert access" on public.blog_posts;
+drop policy if exists "Admin update access" on public.blog_posts;
 
 create policy "Admin insert access" on public.blog_posts for insert with check (public.is_admin_user());
 create policy "Admin update access" on public.blog_posts for update using (public.is_admin_user()) with check (public.is_admin_user());
