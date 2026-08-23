@@ -1,11 +1,28 @@
 -- HappyTrip: core schema (destinations, tours, reviews, blog posts, bookings, profiles)
 -- Run once in the Supabase Dashboard -> SQL Editor -> New query -> Run.
 --
--- NOT YET CONNECTED to the site. The current site reads/writes its data locally
--- (data.js for seed content, store.js for localStorage). This schema is a
--- drop-in target for whenever the site is wired up to a real Supabase project —
--- table and field names intentionally mirror data.js's shape so that migration
--- is closer to a data export than a rewrite.
+-- This is the schema currently backing the live site (data.js fetches from
+-- these tables; falls back to its own local seed data if Supabase is
+-- unreachable). Table and field names mirror data.js's shape.
+--
+-- Write access to the public catalog tables (destinations/tours/blog_posts)
+-- requires a real authenticated session belonging to one of the admin emails
+-- in is_admin_user() below - NOT just the public anon/publishable key, which
+-- anyone can read out of the client-side JS. Re-running this file on an
+-- existing project drops and recreates every table, so it is NOT a safe way
+-- to patch policies on a project that already has data - use harden_rls.sql
+-- for that instead.
+
+create or replace function public.is_admin_user()
+returns boolean
+language sql
+stable
+as $$
+  select coalesce(auth.jwt() ->> 'email', '') in (
+    'lazarepataraia910@gmail.com',
+    'irineirnola@gmail.com'
+  );
+$$;
 
 -- ---------- Destinations ----------
 drop table if exists public.destinations cascade;
@@ -29,9 +46,9 @@ create table public.destinations (
 alter table public.destinations enable row level security;
 
 create policy "Public read access" on public.destinations for select using (true);
-create policy "Public insert access" on public.destinations for insert with check (true);
-create policy "Public update access" on public.destinations for update using (true) with check (true);
-create policy "Public delete access" on public.destinations for delete using (true);
+create policy "Admin insert access" on public.destinations for insert with check (public.is_admin_user());
+create policy "Admin update access" on public.destinations for update using (public.is_admin_user()) with check (public.is_admin_user());
+create policy "Admin delete access" on public.destinations for delete using (public.is_admin_user());
 
 -- ---------- Tours ----------
 drop table if exists public.tours cascade;
@@ -62,7 +79,7 @@ create table public.tours (
   theme text,
   icon text,
   featured boolean not null default false,
-  rating numeric not null default 5.0,
+  rating numeric not null default 0,
   review_count int not null default 0,
   created_at timestamptz not null default now()
 );
@@ -70,9 +87,9 @@ create table public.tours (
 alter table public.tours enable row level security;
 
 create policy "Public read access" on public.tours for select using (true);
-create policy "Public insert access" on public.tours for insert with check (true);
-create policy "Public update access" on public.tours for update using (true) with check (true);
-create policy "Public delete access" on public.tours for delete using (true);
+create policy "Admin insert access" on public.tours for insert with check (public.is_admin_user());
+create policy "Admin update access" on public.tours for update using (public.is_admin_user()) with check (public.is_admin_user());
+create policy "Admin delete access" on public.tours for delete using (public.is_admin_user());
 
 -- ---------- Reviews ----------
 drop table if exists public.reviews cascade;
@@ -91,6 +108,7 @@ alter table public.reviews enable row level security;
 
 create policy "Public read access" on public.reviews for select using (true);
 create policy "Public insert access" on public.reviews for insert with check (true);
+create policy "Admin delete access" on public.reviews for delete using (public.is_admin_user());
 
 -- ---------- Blog posts ----------
 drop table if exists public.blog_posts cascade;
@@ -112,8 +130,8 @@ create table public.blog_posts (
 alter table public.blog_posts enable row level security;
 
 create policy "Public read access" on public.blog_posts for select using (true);
-create policy "Public insert access" on public.blog_posts for insert with check (true);
-create policy "Public update access" on public.blog_posts for update using (true) with check (true);
+create policy "Admin insert access" on public.blog_posts for insert with check (public.is_admin_user());
+create policy "Admin update access" on public.blog_posts for update using (public.is_admin_user()) with check (public.is_admin_user());
 
 -- ---------- Profiles (one row per authenticated user) ----------
 drop table if exists public.profiles cascade;
@@ -161,24 +179,20 @@ create policy "Users read own bookings" on public.bookings for select using (aut
 create policy "Users insert own bookings" on public.bookings for insert with check (auth.uid() = user_id);
 create policy "Users update own bookings" on public.bookings for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
--- admin.html stays client-gated only for now (same tradeoff goodmotoway's admin panel
--- makes). A future upgrade could add an `is_admin` flag on profiles and require it
--- in the tours/destinations write policies above instead of leaving them fully public.
-
 -- ---------- Storage bucket for future tour/destination photos ----------
 insert into storage.buckets (id, name, public)
 values ('happytrip-images', 'happytrip-images', true)
 on conflict (id) do nothing;
 
 drop policy if exists "Public read happytrip images" on storage.objects;
-drop policy if exists "Public upload happytrip images" on storage.objects;
-drop policy if exists "Public delete happytrip images" on storage.objects;
+drop policy if exists "Admin upload happytrip images" on storage.objects;
+drop policy if exists "Admin delete happytrip images" on storage.objects;
 
 create policy "Public read happytrip images" on storage.objects
   for select using (bucket_id = 'happytrip-images');
 
-create policy "Public upload happytrip images" on storage.objects
-  for insert with check (bucket_id = 'happytrip-images');
+create policy "Admin upload happytrip images" on storage.objects
+  for insert with check (bucket_id = 'happytrip-images' and public.is_admin_user());
 
-create policy "Public delete happytrip images" on storage.objects
-  for delete using (bucket_id = 'happytrip-images');
+create policy "Admin delete happytrip images" on storage.objects
+  for delete using (bucket_id = 'happytrip-images' and public.is_admin_user());
