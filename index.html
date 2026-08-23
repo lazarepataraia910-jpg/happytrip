@@ -157,7 +157,7 @@
 <script src="store.js"></script>
 <script src="layout.js"></script>
 <script>
-  (function () {
+  HT_DATA.ready().then(function () {
     var destSelect = document.getElementById('heroDestination');
     HT_DATA.getDestinations().forEach(function (d) {
       var opt = document.createElement('option');
@@ -222,7 +222,7 @@
       });
     }
     wireNewsletter('homeNewsletterForm', 'homeNewsletterOk');
-  })();
+  });
 </script>
 </body>
 </html>

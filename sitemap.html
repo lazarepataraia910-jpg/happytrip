@@ -79,14 +79,14 @@
 <script src="store.js"></script>
 <script src="layout.js"></script>
 <script>
-  (function () {
+  HT_DATA.ready().then(function () {
     var list = document.getElementById('destList');
     HT_DATA.getDestinations().forEach(function (d) {
       var li = document.createElement('li');
       li.innerHTML = '<a href="destination.html?slug=' + d.slug + '">' + d.name + '</a>';
       list.appendChild(li);
     });
-  })();
+  });
 </script>
 </body>
 </html>

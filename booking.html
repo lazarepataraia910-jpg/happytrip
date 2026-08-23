@@ -98,7 +98,7 @@
 <script src="store.js"></script>
 <script src="layout.js"></script>
 <script>
-  (function () {
+  HT_DATA.ready().then(function () {
     var params = new URLSearchParams(window.location.search);
     var tour = HT_DATA.getTourBySlug(params.get('slug') || '');
     if (!tour) { document.getElementById('notFound').style.display = 'block'; return; }
@@ -204,7 +204,7 @@
 
     renderSteps();
     renderSideSummary();
-  })();
+  });
 </script>
 </body>
 </html>

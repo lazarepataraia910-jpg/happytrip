@@ -79,7 +79,7 @@
 <script src="store.js"></script>
 <script src="layout.js"></script>
 <script>
-  (function () {
+  HT_DATA.ready().then(function () {
     var slug = new URLSearchParams(window.location.search).get('slug');
     var tour = slug ? HT_DATA.getTourBySlug(slug) : null;
 
@@ -268,7 +268,7 @@
 
     var relatedGrid = document.getElementById('relatedGrid');
     if (relatedGrid) HT_DATA.getRelatedTours(tour, 3).forEach(function (t) { relatedGrid.appendChild(HT.tourCard(t)); });
-  })();
+  });
 </script>
 </body>
 </html>

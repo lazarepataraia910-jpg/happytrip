@@ -2,7 +2,6 @@
   var K = {
     wishlist: 'ht_wishlist', compare: 'ht_compare', bookings: 'ht_bookings',
     profile: 'ht_profile', theme: 'ht_theme', newsletter: 'ht_newsletter',
-    toursAdded: 'ht_admin_tours_added', toursEdited: 'ht_admin_tours_edited', toursDeleted: 'ht_admin_tours_deleted',
     adminSession: 'ht_admin_session'
   };
 
@@ -22,22 +21,28 @@
     return s;
   }
 
+  function idIndexOf(list, id) {
+    var target = String(id);
+    for (var i = 0; i < list.length; i++) if (String(list[i]) === target) return i;
+    return -1;
+  }
+
   var HT_STORE = {
     getWishlist: function () { return read(K.wishlist, []); },
-    isWishlisted: function (tourId) { return HT_STORE.getWishlist().indexOf(tourId) !== -1; },
+    isWishlisted: function (tourId) { return idIndexOf(HT_STORE.getWishlist(), tourId) !== -1; },
     toggleWishlist: function (tourId) {
       var list = HT_STORE.getWishlist();
-      var idx = list.indexOf(tourId);
+      var idx = idIndexOf(list, tourId);
       if (idx === -1) { list.push(tourId); } else { list.splice(idx, 1); }
       write(K.wishlist, list);
       return idx === -1;
     },
 
     getCompareList: function () { return read(K.compare, []); },
-    isComparing: function (tourId) { return HT_STORE.getCompareList().indexOf(tourId) !== -1; },
+    isComparing: function (tourId) { return idIndexOf(HT_STORE.getCompareList(), tourId) !== -1; },
     toggleCompare: function (tourId) {
       var list = HT_STORE.getCompareList();
-      var idx = list.indexOf(tourId);
+      var idx = idIndexOf(list, tourId);
       if (idx !== -1) { list.splice(idx, 1); write(K.compare, list); return { added: false, full: false }; }
       if (list.length >= 3) return { added: false, full: true };
       list.push(tourId);
@@ -92,30 +97,6 @@
         if (list[i].reference === ref) { list[i].status = status; write(K.bookings, list); return true; }
       }
       return false;
-    },
-
-    getAddedTours: function () { return read(K.toursAdded, []); },
-    addTour: function (tour) {
-      var list = HT_STORE.getAddedTours();
-      tour.id = 'custom-' + Date.now().toString(36);
-      tour.custom = true;
-      list.push(tour);
-      write(K.toursAdded, list);
-      return tour;
-    },
-    getTourEdits: function () { return read(K.toursEdited, {}); },
-    setTourEdit: function (id, fields) {
-      var edits = HT_STORE.getTourEdits();
-      edits[id] = Object.assign({}, edits[id] || {}, fields);
-      write(K.toursEdited, edits);
-    },
-    getDeletedTourIds: function () { return read(K.toursDeleted, []); },
-    deleteTour: function (id) {
-      var added = HT_STORE.getAddedTours();
-      var idx = added.findIndex(function (t) { return t.id === id; });
-      if (idx !== -1) { added.splice(idx, 1); write(K.toursAdded, added); return; }
-      var deleted = HT_STORE.getDeletedTourIds();
-      if (deleted.indexOf(id) === -1) { deleted.push(id); write(K.toursDeleted, deleted); }
     },
 
     isAdminSession: function () { return read(K.adminSession, false) === true; },

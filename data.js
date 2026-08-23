@@ -389,18 +389,87 @@
     }
   ];
 
-  function byId(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
+  function byId(list, id) { for (var i = 0; i < list.length; i++) if (String(list[i].id) === String(id)) return list[i]; return null; }
   function bySlug(list, slug) { for (var i = 0; i < list.length; i++) if (list[i].slug === slug) return list[i]; return null; }
 
-  function allTours() {
-    var store = window.HT_STORE;
-    if (!store) return tours.slice();
-    var added = store.getAddedTours();
-    var edits = store.getTourEdits();
-    var deleted = store.getDeletedTourIds();
-    return tours.concat(added)
-      .filter(function (t) { return deleted.indexOf(t.id) === -1; })
-      .map(function (t) { return edits[t.id] ? Object.assign({}, t, edits[t.id]) : t; });
+  function allTours() { return tours.slice(); }
+
+  // ---------- Supabase (destinations/tours/reviews live there; falls back to the
+  // seed arrays above if the project is unreachable or empty) ----------
+  var SUPABASE_URL = 'https://pwbjpsffmnzxpfqbfkjt.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_zfRZHdcza9cQPW4b4UWubA_kFxrL0Xp';
+  var sbReadyPromise = null;
+
+  function sbFetch(path, options) {
+    options = options || {};
+    var headers = Object.assign(
+      { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+      options.headers || {}
+    );
+    return fetch(SUPABASE_URL + '/rest/v1/' + path, Object.assign({}, options, { headers: headers })).then(function (res) {
+      return res.text().then(function (text) {
+        if (!res.ok) throw new Error('Supabase ' + path + ' -> ' + res.status + ': ' + text);
+        return text ? JSON.parse(text) : null;
+      });
+    });
+  }
+
+  function mapDestRow(row) {
+    return {
+      id: row.id, slug: row.slug, name: row.name, region: row.region, theme: row.theme, icon: row.icon,
+      tagline: row.tagline, description: row.description, bestTime: row.best_time, climate: row.climate,
+      highlights: row.highlights || [], tips: row.tips || []
+    };
+  }
+  function mapReviewRow(row) {
+    var initials = (row.name || '').trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2);
+    return { name: row.name, initials: initials, rating: row.rating, date: (row.created_at || '').slice(0, 10), text: row.text, verified: row.verified };
+  }
+  function mapTourRow(row, reviewsByTourId) {
+    return {
+      id: row.id, slug: row.slug, title: row.title, destinationId: row.destination_id,
+      type: row.type, typeLabel: row.type_label, durationDays: row.duration_days,
+      difficulty: row.difficulty, difficultyLabel: row.difficulty_label,
+      groupMin: row.group_min, groupMax: row.group_max,
+      priceBasic: row.price_basic, priceStandard: row.price_standard, pricePremium: row.price_premium,
+      discount: row.discount, summary: row.summary,
+      inclusions: row.inclusions || [], exclusions: row.exclusions || [],
+      meetingPoint: row.meeting_point, languages: row.languages || [],
+      itinerary: row.itinerary || [], theme: row.theme, icon: row.icon,
+      featured: row.featured, rating: row.rating, reviewCount: row.review_count,
+      reviews: (reviewsByTourId[row.id] || []).map(mapReviewRow)
+    };
+  }
+
+  function refreshFromSupabase() {
+    return Promise.all([
+      sbFetch('destinations?select=*&order=id'),
+      sbFetch('tours?select=*&order=id'),
+      sbFetch('reviews?select=*')
+    ]).then(function (results) {
+      var destRows = results[0] || [], tourRows = results[1] || [], reviewRows = results[2] || [];
+      var reviewsByTourId = {};
+      reviewRows.forEach(function (r) { (reviewsByTourId[r.tour_id] = reviewsByTourId[r.tour_id] || []).push(r); });
+      if (destRows.length) {
+        var mappedDests = destRows.map(mapDestRow);
+        destinations.length = 0;
+        Array.prototype.push.apply(destinations, mappedDests);
+      }
+      if (tourRows.length) {
+        var mappedTours = tourRows.map(function (row) { return mapTourRow(row, reviewsByTourId); });
+        tours.length = 0;
+        Array.prototype.push.apply(tours, mappedTours);
+      }
+    });
+  }
+
+  function ready() {
+    if (!sbReadyPromise) {
+      sbReadyPromise = refreshFromSupabase().catch(function (err) {
+        console.warn('Supabase unavailable, using local seed data.', err);
+      });
+    }
+    return sbReadyPromise;
   }
 
   var HT_DATA = {
@@ -426,7 +495,7 @@
             t.summary.toLowerCase().indexOf(q) !== -1;
         });
       }
-      if (filters.destinationId) list = list.filter(function (t) { return t.destinationId === filters.destinationId; });
+      if (filters.destinationId) list = list.filter(function (t) { return String(t.destinationId) === String(filters.destinationId); });
       if (filters.type) list = list.filter(function (t) { return t.type === filters.type; });
       if (filters.difficulty) list = list.filter(function (t) { return t.difficulty === filters.difficulty; });
       if (filters.maxPrice) list = list.filter(function (t) { return t.priceBasic <= filters.maxPrice; });
@@ -460,6 +529,18 @@
     getPostBySlug: function (slug) { return bySlug(blogPosts, slug); },
     getRelatedPosts: function (post, limit) {
       return blogPosts.filter(function (p) { return p.id !== post.id && p.category === post.category; }).slice(0, limit || 3);
+    },
+
+    ready: ready,
+    refresh: refreshFromSupabase,
+    adminAddTour: function (fields) {
+      return sbFetch('tours', { method: 'POST', body: JSON.stringify([fields]) }).then(refreshFromSupabase);
+    },
+    adminUpdateTour: function (id, fields) {
+      return sbFetch('tours?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(fields) }).then(refreshFromSupabase);
+    },
+    adminDeleteTour: function (id) {
+      return sbFetch('tours?id=eq.' + id, { method: 'DELETE' }).then(refreshFromSupabase);
     }
   };
 

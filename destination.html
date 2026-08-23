@@ -41,7 +41,7 @@
 <script src="store.js"></script>
 <script src="layout.js"></script>
 <script>
-  (function () {
+  HT_DATA.ready().then(function () {
     var slug = new URLSearchParams(window.location.search).get('slug');
     var dest = slug ? HT_DATA.getDestinationBySlug(slug) : null;
     if (!dest) { document.getElementById('notFound').style.display = 'block'; return; }
@@ -71,7 +71,7 @@
 
     var relatedGrid = document.getElementById('relatedGrid');
     if (relatedGrid) relatedTours.forEach(function (t) { relatedGrid.appendChild(HT.tourCard(t)); });
-  })();
+  });
 </script>
 </body>
 </html>

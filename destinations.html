@@ -46,7 +46,7 @@
 <script src="store.js"></script>
 <script src="layout.js"></script>
 <script>
-  (function () {
+  HT_DATA.ready().then(function () {
     var grid = document.getElementById('destGrid');
     function render(q) {
       grid.innerHTML = '';
@@ -63,7 +63,7 @@
     }
     document.getElementById('dQ').addEventListener('input', function (e) { render(e.target.value); });
     render('');
-  })();
+  });
 </script>
 </body>
 </html>

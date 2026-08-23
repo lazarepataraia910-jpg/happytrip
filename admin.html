@@ -129,7 +129,7 @@
     function showDashboard() {
       gate.style.display = 'none';
       dashboard.style.display = 'block';
-      renderAll();
+      HT_DATA.ready().then(renderAll);
     }
     function isAllowlistedEmail() {
       var profile = HT_STORE.getProfile();
@@ -192,8 +192,7 @@
       table.querySelectorAll('[data-del]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           if (!confirm('წავშალო ეს ტური?')) return;
-          HT_STORE.deleteTour(btn.dataset.del);
-          renderAll();
+          HT_DATA.adminDeleteTour(btn.dataset.del).then(renderAll);
           HT.toast('ტური წაიშალა');
         });
       });
@@ -267,37 +266,40 @@
       var difficulty = document.getElementById('tfDifficulty').value;
       var fields = {
         title: title,
-        slug: editingId ? undefined : title.toLowerCase().replace(/[^a-z0-9ა-ჰ]+/gi, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36).slice(-4),
-        destinationId: document.getElementById('tfDestination').value,
-        type: type, typeLabel: TYPE_LABELS[type],
-        difficulty: difficulty, difficultyLabel: DIFF_LABELS[difficulty],
-        durationDays: Number(document.getElementById('tfDuration').value) || 1,
-        groupMin: group[0] || 1, groupMax: group[1] || group[0] || 10,
-        priceBasic: Number(document.getElementById('tfPriceBasic').value) || 0,
-        priceStandard: Number(document.getElementById('tfPriceStandard').value) || 0,
-        pricePremium: Number(document.getElementById('tfPricePremium').value) || 0,
+        destination_id: Number(document.getElementById('tfDestination').value),
+        type: type, type_label: TYPE_LABELS[type],
+        difficulty: difficulty, difficulty_label: DIFF_LABELS[difficulty],
+        duration_days: Number(document.getElementById('tfDuration').value) || 1,
+        group_min: group[0] || 1, group_max: group[1] || group[0] || 10,
+        price_basic: Number(document.getElementById('tfPriceBasic').value) || 0,
+        price_standard: Number(document.getElementById('tfPriceStandard').value) || 0,
+        price_premium: Number(document.getElementById('tfPricePremium').value) || 0,
         summary: document.getElementById('tfSummary').value.trim(),
         inclusions: document.getElementById('tfInclusions').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean),
         exclusions: document.getElementById('tfExclusions').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean),
-        meetingPoint: document.getElementById('tfMeeting').value.trim(),
+        meeting_point: document.getElementById('tfMeeting').value.trim(),
         languages: document.getElementById('tfLanguages').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean),
         discount: Number(document.getElementById('tfDiscount').value) || 0,
         featured: document.getElementById('tfFeatured').checked
       };
 
+      var saveOp;
       if (editingId) {
-        delete fields.slug;
-        HT_STORE.setTourEdit(editingId, fields);
-        HT.toast('ტური განახლდა');
+        saveOp = HT_DATA.adminUpdateTour(editingId, fields);
       } else {
-        fields.rating = 5.0; fields.reviewCount = 0; fields.reviews = [];
+        fields.slug = title.toLowerCase().replace(/[^a-z0-9ა-ჰ]+/gi, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36).slice(-4);
         fields.theme = 'th-2'; fields.icon = 'mountain';
         fields.itinerary = [{ day: 1, title: 'ტურის დღე 1', desc: fields.summary || '' }];
-        HT_STORE.addTour(fields);
-        HT.toast('ტური დაემატა');
+        saveOp = HT_DATA.adminAddTour(fields);
       }
+      saveOp.then(function () {
+        HT.toast(editingId ? 'ტური განახლდა' : 'ტური დაემატა');
+        renderAll();
+      }).catch(function (err) {
+        HT.toast('შეცდომა შენახვისას');
+        console.error(err);
+      });
       tourModal.classList.remove('open');
-      renderAll();
     });
   })();
 </script>

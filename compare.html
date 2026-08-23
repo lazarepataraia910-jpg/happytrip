@@ -44,7 +44,7 @@
 <script src="store.js"></script>
 <script src="layout.js"></script>
 <script>
-  (function () {
+  HT_DATA.ready().then(function () {
     var content = document.getElementById('compareContent');
     var emptyState = document.getElementById('compareEmpty');
 
@@ -96,7 +96,7 @@
       });
     }
     render();
-  })();
+  });
 </script>
 </body>
 </html>

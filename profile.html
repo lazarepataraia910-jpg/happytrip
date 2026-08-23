@@ -77,7 +77,7 @@
 <script src="store.js"></script>
 <script src="layout.js"></script>
 <script>
-  (function () {
+  HT_DATA.ready().then(function () {
     var params = new URLSearchParams(window.location.search);
     var profile = HT_STORE.getProfile();
     document.getElementById('profileGreeting').textContent = profile ? 'გამარჯობა, ' + profile.name : 'სტუმარი';
@@ -168,7 +168,7 @@
       });
     });
     refreshThemeUI();
-  })();
+  });
 </script>
 </body>
 </html>

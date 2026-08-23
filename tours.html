@@ -92,7 +92,7 @@
 <script src="store.js"></script>
 <script src="layout.js"></script>
 <script>
-  (function () {
+  HT_DATA.ready().then(function () {
     var destSelect = document.getElementById('fDestination');
     HT_DATA.getDestinations().forEach(function (d) {
       var opt = document.createElement('option');
@@ -183,7 +183,7 @@
     document.getElementById('emptyReset').addEventListener('click', resetAll);
 
     render();
-  })();
+  });
 </script>
 </body>
 </html>
