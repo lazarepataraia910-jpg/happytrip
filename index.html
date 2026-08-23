@@ -93,16 +93,6 @@
     </div>
   </section>
 
-  <section class="section alt">
-    <div class="wrap">
-      <div class="section-head">
-        <div class="eyebrow">გამოხმაურებები</div>
-        <h2>რას ამბობენ ჩვენი მოგზაურები</h2>
-      </div>
-      <div class="tstm-track" id="tstmTrack"></div>
-    </div>
-  </section>
-
   <section class="section">
     <div class="section-row">
       <div class="section-head">
@@ -158,19 +148,6 @@
 
     var featuredGrid = document.getElementById('featuredGrid');
     HT_DATA.getFeaturedTours(6).forEach(function (t) { featuredGrid.appendChild(HT.tourCard(t)); });
-
-    var tstmTrack = document.getElementById('tstmTrack');
-    var picks = [];
-    HT_DATA.tours.forEach(function (t) { t.reviews.forEach(function (r) { picks.push({ r: r, tourTitle: t.title }); }); });
-    picks.sort(function () { return Math.random() - 0.5; });
-    picks.slice(0, 8).forEach(function (p) {
-      var el = document.createElement('div');
-      el.className = 'tstm-card';
-      el.innerHTML = '<div class="tstm-stars">' + HT.starsHtml(p.r.rating) + '</div>' +
-        '<p class="tstm-quote">&laquo;' + p.r.text + '&raquo;</p>' +
-        '<div class="tstm-person"><div class="tstm-avatar">' + p.r.initials + '</div><div><b>' + p.r.name + '</b><span>' + p.tourTitle + '</span></div></div>';
-      tstmTrack.appendChild(el);
-    });
 
     var blogGrid = document.getElementById('blogGrid');
     HT_DATA.getBlogPosts().slice(0, 3).forEach(function (post) {

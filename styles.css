@@ -274,19 +274,6 @@ label { font-size: 13px; font-weight: 700; margin-bottom: 6px; display: block; }
 .card-price span { font-size: 11.5px; color: var(--slate); display: block; }
 .card-compare-check { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--slate); }
 
-/* ---------- Testimonials ---------- */
-.tstm-track { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; }
-.tstm-track::-webkit-scrollbar { height: 6px; }
-.tstm-track::-webkit-scrollbar-thumb { background: var(--line-light); border-radius: 999px; }
-.tstm-card { scroll-snap-align: start; flex: 0 0 320px; background: var(--surface); border: 1px solid var(--line-light); border-radius: 16px; padding: 22px; }
-.tstm-stars { display: flex; gap: 2px; margin-bottom: 12px; color: var(--gold); }
-.tstm-stars svg { width: 15px; height: 15px; fill: var(--gold); }
-.tstm-quote { font-size: 14.5px; line-height: 1.65; margin: 0 0 16px; }
-.tstm-person { display: flex; align-items: center; gap: 10px; }
-.tstm-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--line-light); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: var(--forest); flex-shrink: 0; }
-.tstm-person b { display: block; font-size: 13.5px; }
-.tstm-person span { font-size: 12px; color: var(--slate); }
-
 /* ---------- Why-us / feature blocks ---------- */
 .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; }
 .feat-card { padding: 4px; }

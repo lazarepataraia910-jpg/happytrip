@@ -54,7 +54,7 @@
       ['ხანგრძლივობა', function (t) { return t.durationDays + ' დღე'; }],
       ['სირთულე', function (t) { return t.difficultyLabel; }],
       ['ჯგუფის ზომა', function (t) { return t.groupMin + '–' + t.groupMax; }],
-      ['რეიტინგი', function (t) { return t.rating + ' (' + t.reviewCount + ')'; }],
+      ['რეიტინგი', function (t) { return t.reviewCount ? t.rating + ' (' + t.reviewCount + ')' : 'ჯერ არ არის შეფასებული'; }],
       ['საბაზისო ფასი', function (t) { return HT.formatGel(HT_DATA.finalPrice(t, 'basic')); }],
       ['სტანდარტი ფასი', function (t) { return HT.formatGel(HT_DATA.finalPrice(t, 'standard')); }],
       ['პრემიუმ ფასი', function (t) { return HT.formatGel(HT_DATA.finalPrice(t, 'premium')); }],

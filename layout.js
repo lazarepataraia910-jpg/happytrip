@@ -341,7 +341,7 @@
       '<div class="card-body">' +
         '<div class="card-loc">' + icon('mapPin') + ' ' + (dest ? dest.name : '') + '</div>' +
         '<h3 class="card-title"><a href="tour.html?slug=' + t.slug + '">' + t.title + '</a></h3>' +
-        '<div class="card-meta"><span>' + t.durationDays + ' დღე</span><span>&middot;</span><span>' + t.difficultyLabel + '</span><span>&middot;</span><span class="card-rating">' + icon('star') + ' ' + t.rating + ' (' + t.reviewCount + ')</span></div>' +
+        '<div class="card-meta"><span>' + t.durationDays + ' დღე</span><span>&middot;</span><span>' + t.difficultyLabel + '</span>' + (t.reviewCount ? '<span>&middot;</span><span class="card-rating">' + icon('star') + ' ' + t.rating + ' (' + t.reviewCount + ')</span>' : '') + '</div>' +
         (opts.showCompare ? '<label class="card-compare-check"><input type="checkbox" data-compare="' + t.id + '"' + (comparing ? ' checked' : '') + ' /> შედარებაში დამატება</label>' : '') +
         '<div class="card-foot"><div class="card-price">' + (t.discount ? '<span class="was">' + formatGel(t.priceBasic) + '</span>' : '') + '<b>' + formatGel(price) + '</b><span>1 პიროვნებაზე</span></div><a class="btn btn-dark btn-sm" href="tour.html?slug=' + t.slug + '">ნახვა</a></div>' +
       '</div>';

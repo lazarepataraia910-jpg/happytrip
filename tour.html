@@ -130,6 +130,9 @@
     }
 
     function reviewsHtml() {
+      if (!tour.reviewCount || !tour.reviews.length) {
+        return '<div class="empty-state show"><p>ჯერ არ არის მიმოხილვები</p><span style="color:var(--slate);font-size:13.5px">იყავით პირველი, ვინც შეაფასებს ამ ტურს ჯავშნის შემდეგ.</span></div>';
+      }
       var avg = tour.rating;
       return '<div class="rating-summary"><div class="big">' + avg + '</div><div><div>' + HT.starsHtml(avg) + '</div><div style="font-size:12.5px;color:var(--slate);margin-top:4px">' + tour.reviewCount + ' შეფასების საფუძველზე</div></div></div>' +
         tour.reviews.map(function (r) {
@@ -161,7 +164,7 @@
       '<div class="tour-head">' +
         '<div><div class="card-loc">' + HT.icon('mapPin') + ' ' + (dest ? dest.name : '') + '</div>' +
         '<h1 class="display">' + tour.title + '</h1>' +
-        '<div class="card-meta"><span class="tag">' + tour.typeLabel + '</span><span class="card-rating">' + HT.icon('star') + ' ' + tour.rating + ' (' + tour.reviewCount + ' შეფასება)</span></div></div>' +
+        '<div class="card-meta"><span class="tag">' + tour.typeLabel + '</span>' + (tour.reviewCount ? '<span class="card-rating">' + HT.icon('star') + ' ' + tour.rating + ' (' + tour.reviewCount + ' შეფასება)</span>' : '<span style="color:var(--slate);font-size:12.5px">ჯერ არ არის შეფასებული</span>') + '</div></div>' +
         '<div class="tour-actions">' +
           '<button class="btn btn-icon btn-ghost" id="wishBtn" aria-label="რჩეულებში დამატება">' + HT.icon('heart') + '</button>' +
           '<button class="btn btn-icon btn-ghost" id="compareBtn" aria-label="შედარებაში დამატება">' + HT.icon('compare') + '</button>' +
@@ -174,7 +177,7 @@
           '<div class="tabs">' +
             '<button class="tab-btn active" data-tab="overview">მიმოხილვა</button>' +
             '<button class="tab-btn" data-tab="itinerary">დღიური მარშრუტი</button>' +
-            '<button class="tab-btn" data-tab="reviews">მიმოხილვები (' + tour.reviewCount + ')</button>' +
+            '<button class="tab-btn" data-tab="reviews">მიმოხილვები' + (tour.reviewCount ? ' (' + tour.reviewCount + ')' : '') + '</button>' +
           '</div>' +
           '<div class="tab-panel active" data-panel="overview">' + specGridHtml() + inclusionsHtml() + '</div>' +
           '<div class="tab-panel" data-panel="itinerary">' + itineraryHtml() + '</div>' +
