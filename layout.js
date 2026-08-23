@@ -263,8 +263,14 @@
       window.HT_DATA.getSupabaseClient().then(function (client) {
         return client.auth.signInWithIdToken({ provider: 'google', token: response.credential });
       }).then(function (res) {
-        if (res.error) console.warn('Supabase sign-in failed:', res.error.message);
-      }).catch(function (err) { console.warn('Supabase sign-in failed:', err); });
+        if (res.error) {
+          console.warn('Supabase sign-in failed:', res.error.message);
+          setTimeout(function () { toast('Supabase სესია ვერ დამყარდა: ' + res.error.message); }, 1500);
+        }
+      }).catch(function (err) {
+        console.warn('Supabase sign-in failed:', err);
+        setTimeout(function () { toast('Supabase სესია ვერ დამყარდა: ' + (err && err.message ? err.message : err)); }, 1500);
+      });
     }
   }
 
