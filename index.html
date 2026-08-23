@@ -12,11 +12,6 @@
   .cat-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
   .cat-pill { padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.16); color: rgba(255,255,255,0.85); font-size: 13px; font-weight: 600; }
   .cat-pill:hover { border-color: var(--primary); color: #fff; }
-  .dest-card { position: relative; border-radius: 16px; overflow: hidden; aspect-ratio: 3/3.6; display: flex; align-items: flex-end; }
-  .dest-card .ph-media { position: absolute; inset: 0; }
-  .dest-card .dest-info { position: relative; z-index: 2; padding: 18px; color: #fff; background: linear-gradient(0deg, rgba(0,0,0,0.55), transparent 70%); width: 100%; }
-  .dest-card .dest-info b { font-size: 16px; display: block; }
-  .dest-card .dest-info span { font-size: 12px; opacity: 0.85; }
   .newsletter-band { background: var(--forest); color: #fff; border-radius: 24px; padding: 48px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
   .newsletter-band h2 { font-size: 24px; margin: 0 0 8px; }
   .newsletter-band p { margin: 0; color: rgba(255,255,255,0.75); font-size: 14px; max-width: 420px; }
@@ -72,19 +67,7 @@
 
 <main id="main">
 
-  <section class="section" style="padding-top:0;margin-top:56px">
-    <div class="section-row">
-      <div class="section-head">
-        <div class="eyebrow">დანიშნულებები</div>
-        <h2>პოპულარული მიმართულებები</h2>
-        <p>ცხრა რეგიონი, თითოეული საკუთარი ხასიათით — აირჩიეთ საწყისი წერტილი თქვენი მოგზაურობისთვის.</p>
-      </div>
-      <a class="btn btn-ghost" href="destinations.html">ყველა დანიშნულება &rarr;</a>
-    </div>
-    <div class="grid grid-4" id="destGrid"></div>
-  </section>
-
-  <section class="section alt">
+  <section class="section alt" style="margin-top:56px">
     <div class="wrap">
       <div class="section-row">
         <div class="section-head">
@@ -173,15 +156,6 @@
       if (q) params.set('q', q);
       if (destId) params.set('destination', destId);
       window.location.href = 'tours.html' + (params.toString() ? '?' + params.toString() : '');
-    });
-
-    var destGrid = document.getElementById('destGrid');
-    HT_DATA.getDestinations().slice(0, 8).forEach(function (d) {
-      var el = document.createElement('a');
-      el.href = 'destination.html?slug=' + d.slug;
-      el.className = 'dest-card';
-      el.innerHTML = HT.phMedia(d.theme, d.icon) + '<div class="dest-info"><b>' + d.name + '</b><span>' + d.region + '</span></div>';
-      destGrid.appendChild(el);
     });
 
     var featuredGrid = document.getElementById('featuredGrid');
