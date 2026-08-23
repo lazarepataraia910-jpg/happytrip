@@ -184,6 +184,33 @@
       document.getElementById('statRevenue').textContent = HT.formatGel(revenue);
     }
 
+    function wireDeleteButtons(table) {
+      table.querySelectorAll('[data-del]').forEach(function (btn) {
+        var originalHtml = btn.innerHTML;
+        var resetTimer = null;
+        function reset() {
+          clearTimeout(resetTimer);
+          btn.classList.remove('confirming');
+          btn.innerHTML = originalHtml;
+          btn.setAttribute('aria-label', 'ტურის წაშლა');
+        }
+        btn.setAttribute('aria-label', 'ტურის წაშლა');
+        btn.addEventListener('click', function () {
+          if (!btn.classList.contains('confirming')) {
+            btn.classList.add('confirming');
+            btn.innerHTML = HT.icon('check');
+            btn.setAttribute('aria-label', 'დარწმუნებული ხართ? დააჭირეთ ისევ წასაშლელად');
+            resetTimer = setTimeout(reset, 3000);
+            return;
+          }
+          reset();
+          HT_DATA.adminDeleteTour(btn.dataset.del).then(renderAll);
+          HT.toast('ტური წაიშალა');
+        });
+        btn.addEventListener('blur', reset);
+      });
+    }
+
     function renderTours() {
       var tours = HT_DATA.getAllTours();
       var table = document.getElementById('toursTable');
@@ -194,13 +221,7 @@
             '<td><div class="admin-actions"><button data-edit="' + t.id + '">' + HT.icon('edit') + '</button><button class="danger" data-del="' + t.id + '">' + HT.icon('trash') + '</button></div></td></tr>';
         }).join('');
       table.querySelectorAll('[data-edit]').forEach(function (btn) { btn.addEventListener('click', function () { openTourModal(HT_DATA.getTourById(btn.dataset.edit)); }); });
-      table.querySelectorAll('[data-del]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          if (!confirm('წავშალო ეს ტური?')) return;
-          HT_DATA.adminDeleteTour(btn.dataset.del).then(renderAll);
-          HT.toast('ტური წაიშალა');
-        });
-      });
+      wireDeleteButtons(table);
     }
 
     function renderDestinations() {
