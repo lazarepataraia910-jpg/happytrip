@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ჯავშანი — HappyTrip</title>
-<meta name="description" content="დაასრულეთ თქვენი ტურის ჯავშანი — მოგზაურთა დეტალები, დამატებითი სერვისები და დადასტურება." />
+<meta name="description" content="დაასრულეთ თქვენი ტურის ჯავშანი — მოგზაურთა დეტალები და დადასტურება." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23D9713C'/%3E%3Cpath d='M3 19h18L14.5 7l-3 5-2-2.5z' fill='white'/%3E%3C/svg%3E" />
 <script>try{if(localStorage.getItem('ht_theme')==='"dark"')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
 <link rel="stylesheet" href="styles.css" />
@@ -15,12 +15,6 @@
   .step-panel.active { display: block; }
   .traveler-block { border: 1px solid var(--line-light); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
   .traveler-block b { font-size: 13px; display: block; margin-bottom: 10px; }
-  .extra-item { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid var(--line-light); border-radius: 12px; margin-bottom: 10px; }
-  .extra-item input { width: auto; margin-top: 3px; }
-  .extra-item .ex-body { flex: 1; }
-  .extra-item .ex-body b { font-size: 14px; display: block; }
-  .extra-item .ex-body span { font-size: 12.5px; color: var(--slate); }
-  .extra-item .ex-price { font-weight: 700; font-size: 13.5px; white-space: nowrap; }
   .summary-row { display: flex; justify-content: space-between; font-size: 13.5px; padding: 8px 0; }
   .summary-row.total { border-top: 1px solid var(--line-light); margin-top: 8px; padding-top: 14px; font-size: 16px; font-weight: 800; }
   .step-nav { display: flex; justify-content: space-between; margin-top: 24px; gap: 10px; }
@@ -54,14 +48,6 @@
         </div>
 
         <div class="step-panel panel" data-step="2">
-          <h2 style="font-size:17px;margin:0 0 16px">დამატებითი სერვისები</h2>
-          <label class="extra-item"><input type="checkbox" id="exInsurance" /><div class="ex-body"><b>სამოგზაურო დაზღვევა</b><span>დაზღვევა უბედური შემთხვევის, დაზიანების ან გაუქმების შემთხვევაში</span></div><div class="ex-price">+15 ₾ / მოგზაურზე</div></label>
-          <label class="extra-item"><input type="checkbox" id="exTransfer" /><div class="ex-body"><b>აეროპორტის ტრანსფერი</b><span>მისვლა-წამოსვლა თბილისის აეროპორტიდან</span></div><div class="ex-price">+25 ₾</div></label>
-          <label class="extra-item"><input type="checkbox" id="exPhoto" /><div class="ex-body"><b>ფოტო-ვიდეო პაკეტი</b><span>პროფესიონალი ფოტოგრაფი ტურის განმავლობაში</span></div><div class="ex-price">+60 ₾</div></label>
-          <label class="extra-item"><input type="checkbox" id="exVeg" /><div class="ex-body"><b>ვეგეტარიანული მენიუ</b><span>ყველა ჩართული კვება ვეგეტარიანული იქნება</span></div><div class="ex-price">უფასო</div></label>
-        </div>
-
-        <div class="step-panel panel" data-step="3">
           <h2 style="font-size:17px;margin:0 0 16px">მიმოხილვა და დადასტურება</h2>
           <div id="reviewSummary"></div>
           <label class="checkbox-row" style="margin-top:16px">
@@ -135,7 +121,7 @@
       travelerFields.appendChild(block);
     }
 
-    var STEPS = ['საკონტაქტო ინფო', 'დამატებითი სერვისები', 'დადასტურება'];
+    var STEPS = ['საკონტაქტო ინფო', 'დადასტურება'];
     var current = 1;
 
     function renderSteps() {
@@ -150,14 +136,7 @@
     }
 
     function basePrice() { return HT_DATA.finalPrice(tour, tier); }
-    function extrasTotal() {
-      var t = 0;
-      if (document.getElementById('exInsurance').checked) t += 15 * travelers;
-      if (document.getElementById('exTransfer').checked) t += 25;
-      if (document.getElementById('exPhoto').checked) t += 60;
-      return t;
-    }
-    function grandTotal() { return basePrice() * travelers + extrasTotal(); }
+    function grandTotal() { return basePrice() * travelers; }
 
     function renderSideSummary() {
       var side = document.getElementById('sideSummary');
@@ -168,7 +147,6 @@
         '<div class="summary-row"><span>თარიღი</span><span>' + (date || 'შეთანხმებით') + '</span></div>' +
         '<div class="summary-row"><span>მოგზაურები</span><span>' + travelers + '</span></div>' +
         '<div class="summary-row"><span>ფასი 1 პიროვნებაზე</span><span>' + HT.formatGel(basePrice()) + '</span></div>' +
-        (extrasTotal() ? '<div class="summary-row"><span>დამატებითი სერვისები</span><span>' + HT.formatGel(extrasTotal()) + '</span></div>' : '') +
         '<div class="summary-row total"><span>ჯამი</span><span>' + HT.formatGel(grandTotal()) + '</span></div>';
     }
 
@@ -183,10 +161,6 @@
         '<div class="divider"></div>' +
         '<div class="summary-row total"><span>ჯამური თანხა</span><span>' + HT.formatGel(grandTotal()) + '</span></div>';
     }
-
-    ['exInsurance', 'exTransfer', 'exPhoto'].forEach(function (id) {
-      document.getElementById(id).addEventListener('change', renderSideSummary);
-    });
 
     function goToStep(n) {
       current = n;
@@ -220,7 +194,6 @@
         contactPhone: document.getElementById('contactPhone').value,
         travelerNames: names,
         specialRequests: document.getElementById('specialRequests').value,
-        extras: { insurance: document.getElementById('exInsurance').checked, transfer: document.getElementById('exTransfer').checked, photo: document.getElementById('exPhoto').checked, veg: document.getElementById('exVeg').checked },
         total: grandTotal()
       });
       document.getElementById('wizard').style.display = 'none';
