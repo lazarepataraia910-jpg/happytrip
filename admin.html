@@ -43,6 +43,8 @@
       <button class="btn btn-ghost btn-sm" id="logoutBtn">გამოსვლა</button>
     </div>
 
+    <div class="alert alert-info" id="noWriteSessionNote" style="display:none;margin-bottom:20px">ხართ დაშვებული სანახავად, მაგრამ არ გაქვთ აქტიური Google სესია — დამატება/რედაქტირება/წაშლა არ იმუშავებს, სანამ ხელახლა არ შეხვალთ Google-ით (ზედა მარჯვენა კუთხეში).</div>
+
     <div class="admin-stat-row">
       <div class="admin-stat"><b id="statTours">0</b><span>აქტიური ტური</span></div>
       <div class="admin-stat"><b id="statDest">0</b><span>დანიშნულება</span></div>
@@ -135,6 +137,11 @@
       gate.style.display = 'none';
       dashboard.style.display = 'block';
       HT_DATA.ready().then(renderAll);
+      HT_DATA.getAdminSession().then(function (session) {
+        var email = session && session.user && session.user.email;
+        var hasRealSession = !!(email && ADMIN_EMAILS.indexOf(email) !== -1);
+        document.getElementById('noWriteSessionNote').style.display = hasRealSession ? 'none' : 'flex';
+      });
     }
     function isAllowlistedEmail() {
       var profile = HT_STORE.getProfile();
@@ -204,8 +211,13 @@
             return;
           }
           reset();
-          HT_DATA.adminDeleteTour(btn.dataset.del).then(renderAll);
-          HT.toast('ტური წაიშალა');
+          HT_DATA.adminDeleteTour(btn.dataset.del).then(function () {
+            HT.toast('ტური წაიშალა');
+            renderAll();
+          }).catch(function (err) {
+            HT.toast('წაშლა ვერ მოხერხდა — საჭიროა Google-ით შესვლა ადმინის ანგარიშით');
+            console.error(err);
+          });
         });
         btn.addEventListener('blur', reset);
       });
@@ -322,7 +334,7 @@
         HT.toast(editingId ? 'ტური განახლდა' : 'ტური დაემატა');
         renderAll();
       }).catch(function (err) {
-        HT.toast('შეცდომა შენახვისას');
+        HT.toast('შენახვა ვერ მოხერხდა — საჭიროა Google-ით შესვლა ადმინის ანგარიშით');
         console.error(err);
       });
       tourModal.classList.remove('open');

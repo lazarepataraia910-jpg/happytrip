@@ -255,6 +255,17 @@
     renderAuthSlot();
     updateWishCount();
     toast('კეთილი იყოს თქვენი მობრძანება, ' + (data.name || '') + '!');
+
+    // Also establish a real Supabase session from the same Google credential,
+    // so admin.html's writes carry a genuine auth.jwt() the RLS policies can check
+    // (the decode above is purely local/decorative and proves nothing server-side).
+    if (window.HT_DATA && window.HT_DATA.getSupabaseClient) {
+      window.HT_DATA.getSupabaseClient().then(function (client) {
+        return client.auth.signInWithIdToken({ provider: 'google', token: response.credential });
+      }).then(function (res) {
+        if (res.error) console.warn('Supabase sign-in failed:', res.error.message);
+      }).catch(function (err) { console.warn('Supabase sign-in failed:', err); });
+    }
   }
 
   function renderGoogleButton() {

@@ -848,6 +848,27 @@
     });
   }
 
+  var sbClient = null;
+  var sbClientPromise = null;
+  function getSupabaseClient() {
+    if (sbClientPromise) return sbClientPromise;
+    sbClientPromise = new Promise(function (resolve) {
+      function makeClient() {
+        sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        resolve(sbClient);
+      }
+      if (window.supabase && window.supabase.createClient) { makeClient(); return; }
+      var existing = document.getElementById('supabaseSdk');
+      if (existing) { existing.addEventListener('load', makeClient); return; }
+      var s = document.createElement('script');
+      s.id = 'supabaseSdk';
+      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
+      s.onload = makeClient;
+      document.head.appendChild(s);
+    });
+    return sbClientPromise;
+  }
+
   function mapDestRow(row) {
     return {
       id: row.id, slug: row.slug, name: row.name, region: row.region, theme: row.theme, icon: row.icon,
@@ -967,14 +988,22 @@
 
     ready: ready,
     refresh: refreshFromSupabase,
+    getSupabaseClient: getSupabaseClient,
+    getAdminSession: function () {
+      return getSupabaseClient().then(function (client) { return client.auth.getSession(); })
+        .then(function (res) { return (res.data && res.data.session) || null; });
+    },
     adminAddTour: function (fields) {
-      return sbFetch('tours', { method: 'POST', body: JSON.stringify([fields]) }).then(refreshFromSupabase);
+      return getSupabaseClient().then(function (client) { return client.from('tours').insert([fields]); })
+        .then(function (res) { if (res.error) throw res.error; return refreshFromSupabase(); });
     },
     adminUpdateTour: function (id, fields) {
-      return sbFetch('tours?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(fields) }).then(refreshFromSupabase);
+      return getSupabaseClient().then(function (client) { return client.from('tours').update(fields).eq('id', id); })
+        .then(function (res) { if (res.error) throw res.error; return refreshFromSupabase(); });
     },
     adminDeleteTour: function (id) {
-      return sbFetch('tours?id=eq.' + id, { method: 'DELETE' }).then(refreshFromSupabase);
+      return getSupabaseClient().then(function (client) { return client.from('tours').delete().eq('id', id); })
+        .then(function (res) { if (res.error) throw res.error; return refreshFromSupabase(); });
     }
   };
 
