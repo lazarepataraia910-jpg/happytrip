@@ -400,12 +400,12 @@
           return HT_DATA.adminAddTour(fields);
         })
         .then(function () {
-          HT.toast(editingId ? 'ტური განახლდა' : 'ტური დაემატა');
+          HT.toast('DIAGNOSTIKA: შენახულია ' + fields.images.length + ' ფოტოთი (slug: ' + slug + ')', 20000);
           renderAll();
           tourModal.classList.remove('open');
         })
         .catch(function (err) {
-          HT.toast('შენახვა ვერ მოხერხდა — საჭიროა Google-ით შესვლა ადმინის ანგარიშით');
+          HT.toast('DIAGNOSTIKA: შენახვა ვერ მოხერხდა — ' + (err && err.message ? err.message : err), 20000);
           console.error(err);
         })
         .then(function () {
