@@ -68,3 +68,25 @@ drop policy if exists "Admin update access" on public.blog_posts;
 
 create policy "Admin insert access" on public.blog_posts for insert with check (public.is_admin_user());
 create policy "Admin update access" on public.blog_posts for update using (public.is_admin_user()) with check (public.is_admin_user());
+
+-- ---------- Storage (tour/destination photos) ----------
+-- This bucket's policies were never touched by the earlier table hardening
+-- above - it was still fully open to the public key for upload/delete.
+insert into storage.buckets (id, name, public)
+values ('happytrip-images', 'happytrip-images', true)
+on conflict (id) do nothing;
+
+drop policy if exists "Public read happytrip images" on storage.objects;
+drop policy if exists "Public upload happytrip images" on storage.objects;
+drop policy if exists "Public delete happytrip images" on storage.objects;
+drop policy if exists "Admin upload happytrip images" on storage.objects;
+drop policy if exists "Admin delete happytrip images" on storage.objects;
+
+create policy "Public read happytrip images" on storage.objects
+  for select using (bucket_id = 'happytrip-images');
+
+create policy "Admin upload happytrip images" on storage.objects
+  for insert with check (bucket_id = 'happytrip-images' and public.is_admin_user());
+
+create policy "Admin delete happytrip images" on storage.objects
+  for delete using (bucket_id = 'happytrip-images' and public.is_admin_user());

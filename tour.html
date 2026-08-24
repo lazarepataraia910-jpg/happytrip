@@ -14,7 +14,11 @@
 <script defer src="/_vercel/insights/script.js"></script>
 <link rel="stylesheet" href="styles.css" />
 <style>
-  .tour-hero-media { aspect-ratio: 21/8; border-radius: 20px; margin-bottom: 26px; }
+  .tour-hero-media { aspect-ratio: 21/8; border-radius: 20px; margin-bottom: 12px; overflow: hidden; }
+  .tour-hero-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tour-gallery-strip { display: flex; gap: 8px; margin-bottom: 26px; overflow-x: auto; }
+  .tour-gallery-strip img { width: 84px; height: 60px; object-fit: cover; border-radius: 10px; cursor: pointer; border: 2px solid transparent; flex-shrink: 0; }
+  .tour-gallery-strip img.active { border-color: var(--primary); }
   .tour-head { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 22px; }
   .tour-head h1 { font-size: 30px; margin: 6px 0 10px; }
   .tour-head .card-loc { font-size: 13.5px; }
@@ -164,8 +168,18 @@
       return '<section class="section tight"><div class="section-head"><div class="eyebrow">მსგავსი</div><h2>შესაძლოა დაგაინტერესოთ</h2></div><div class="grid grid-3" id="relatedGrid"></div></section>';
     }
 
+    var hasPhotos = tour.images && tour.images.length > 0;
+    var heroMediaHtml = hasPhotos
+      ? '<div class="tour-hero-media" id="tourHeroMedia"><img src="' + tour.images[0] + '" alt="' + tour.title + '" /></div>'
+      : '<div class="ph-media tour-hero-media ' + tour.theme + '" style="margin-bottom:26px">' + HT.icon(tour.icon) + '</div>';
+    var galleryStripHtml = hasPhotos && tour.images.length > 1
+      ? '<div class="tour-gallery-strip">' + tour.images.map(function (url, i) {
+          return '<img src="' + url + '" alt="" data-gallery-idx="' + i + '" class="' + (i === 0 ? 'active' : '') + '" />';
+        }).join('') + '</div>'
+      : '';
+
     document.getElementById('tourContent').innerHTML =
-      '<div class="ph-media tour-hero-media ' + tour.theme + '">' + HT.icon(tour.icon) + '</div>' +
+      heroMediaHtml + galleryStripHtml +
       '<div class="tour-head">' +
         '<div><div class="card-loc">' + HT.icon('mapPin') + ' ' + (dest ? dest.name : '') + '</div>' +
         '<h1 class="display">' + tour.title + '</h1>' +
@@ -204,6 +218,16 @@
         '</div>' +
       '</div>' +
       relatedHtml();
+
+    if (hasPhotos) {
+      document.querySelectorAll('[data-gallery-idx]').forEach(function (thumb) {
+        thumb.addEventListener('click', function () {
+          document.querySelector('#tourHeroMedia img').src = tour.images[Number(thumb.dataset.galleryIdx)];
+          document.querySelectorAll('[data-gallery-idx]').forEach(function (t) { t.classList.remove('active'); });
+          thumb.classList.add('active');
+        });
+      });
+    }
 
     // tabs
     document.querySelectorAll('.tab-btn').forEach(function (btn) {

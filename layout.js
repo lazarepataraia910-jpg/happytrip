@@ -357,7 +357,7 @@
     card.className = 'card';
     card.innerHTML =
       '<a href="tour.html?slug=' + t.slug + '" style="display:block">' +
-      '<div class="card-media">' + phMedia(t.theme, t.icon) +
+      '<div class="card-media">' + (t.images && t.images.length ? '<img src="' + t.images[0] + '" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover" />' : phMedia(t.theme, t.icon)) +
         '<div class="card-badges">' + (t.featured ? '<span class="badge badge-primary">რჩეული</span>' : '') + (t.discount ? '<span class="badge badge-gold">-' + t.discount + '%</span>' : '') + '</div>' +
         '<button class="card-wish' + (wished ? ' active' : '') + '" data-wish="' + t.id + '" aria-label="რჩეულებში დამატება">' + icon('heart') + '</button>' +
       '</div></a>' +

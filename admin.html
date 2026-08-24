@@ -19,6 +19,11 @@
   .gate-box h1 { font-size: 19px; margin: 0 0 8px; }
   .gate-box p { color: var(--slate); font-size: 13px; margin: 0 0 20px; }
   .panel-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+  .img-thumb { position: relative; width: 72px; height: 72px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line-light); flex-shrink: 0; }
+  .img-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .img-thumb.pending img { opacity: 0.55; }
+  .img-thumb .rm-btn { position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; border-radius: 50%; background: rgba(0,0,0,0.65); color: #fff; border: none; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .img-thumb .rm-btn svg { width: 12px; height: 12px; }
 </style>
 </head>
 <body data-page="">
@@ -115,6 +120,12 @@
     <div class="field-row">
       <div class="field"><label>ფასდაკლება (%)</label><input type="number" id="tfDiscount" value="0" /></div>
       <div class="field" style="display:flex;align-items:center;padding-top:22px"><label class="checkbox-row"><input type="checkbox" id="tfFeatured" /> გამორჩეულ ტურებში ჩვენება</label></div>
+    </div>
+    <div class="field">
+      <label>ფოტოები</label>
+      <div id="tfImagesPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"></div>
+      <input type="file" id="tfImageInput" accept="image/*" multiple />
+      <p class="field-hint" id="tfImageStatus"></p>
     </div>
     <div style="display:flex;gap:8px;margin-top:10px">
       <button class="btn btn-ghost" id="tourModalCancel" style="flex:1">გაუქმება</button>
@@ -269,8 +280,49 @@
 
     var tourModal = document.getElementById('tourModal');
     var editingId = null;
+    var editingSlug = null;
+    var currentImages = [];   // URLs already saved (or kept after removal)
+    var removedImages = [];   // saved URLs the admin removed - deleted from storage on save
+    var pendingFiles = [];    // newly chosen files - uploaded on save
+
+    function renderImagePreview() {
+      var wrap = document.getElementById('tfImagesPreview');
+      wrap.innerHTML = '';
+      currentImages.forEach(function (url, idx) {
+        var el = document.createElement('div');
+        el.className = 'img-thumb';
+        el.innerHTML = '<img src="' + url + '" alt="" /><button type="button" class="rm-btn">' + HT.icon('x') + '</button>';
+        el.querySelector('.rm-btn').addEventListener('click', function () {
+          removedImages.push(url);
+          currentImages.splice(idx, 1);
+          renderImagePreview();
+        });
+        wrap.appendChild(el);
+      });
+      pendingFiles.forEach(function (file, idx) {
+        var el = document.createElement('div');
+        el.className = 'img-thumb pending';
+        el.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="" /><button type="button" class="rm-btn">' + HT.icon('x') + '</button>';
+        el.querySelector('.rm-btn').addEventListener('click', function () {
+          pendingFiles.splice(idx, 1);
+          renderImagePreview();
+        });
+        wrap.appendChild(el);
+      });
+    }
+    document.getElementById('tfImageInput').addEventListener('change', function (e) {
+      pendingFiles = pendingFiles.concat(Array.prototype.slice.call(e.target.files));
+      e.target.value = '';
+      renderImagePreview();
+    });
+
     function openTourModal(tour) {
       editingId = tour ? tour.id : null;
+      editingSlug = tour ? tour.slug : null;
+      currentImages = tour && tour.images ? tour.images.slice() : [];
+      removedImages = [];
+      pendingFiles = [];
+      renderImagePreview();
       document.getElementById('tourModalTitle').textContent = tour ? 'ტურის რედაქტირება' : 'ახალი ტური';
       var destSel = document.getElementById('tfDestination');
       destSel.innerHTML = HT_DATA.getDestinations().map(function (d) { return '<option value="' + d.id + '">' + d.name + '</option>'; }).join('');
@@ -307,6 +359,7 @@
       var group = document.getElementById('tfGroup').value.split('-').map(Number);
       var type = document.getElementById('tfType').value;
       var difficulty = document.getElementById('tfDifficulty').value;
+      var slug = editingSlug || (title.toLowerCase().replace(/[^a-z0-9ა-ჰ]+/gi, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36).slice(-4));
       var fields = {
         title: title,
         destination_id: Number(document.getElementById('tfDestination').value),
@@ -326,23 +379,39 @@
         featured: document.getElementById('tfFeatured').checked
       };
 
-      var saveOp;
-      if (editingId) {
-        saveOp = HT_DATA.adminUpdateTour(editingId, fields);
-      } else {
-        fields.slug = title.toLowerCase().replace(/[^a-z0-9ა-ჰ]+/gi, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36).slice(-4);
-        fields.theme = 'th-2'; fields.icon = 'mountain';
-        fields.itinerary = [{ day: 1, title: 'ტურის დღე 1', desc: fields.summary || '' }];
-        saveOp = HT_DATA.adminAddTour(fields);
-      }
-      saveOp.then(function () {
-        HT.toast(editingId ? 'ტური განახლდა' : 'ტური დაემატა');
-        renderAll();
-      }).catch(function (err) {
-        HT.toast('შენახვა ვერ მოხერხდა — საჭიროა Google-ით შესვლა ადმინის ანგარიშით');
-        console.error(err);
-      });
-      tourModal.classList.remove('open');
+      var saveBtn = this;
+      var statusEl = document.getElementById('tfImageStatus');
+      saveBtn.disabled = true;
+      statusEl.textContent = pendingFiles.length ? 'ფოტოები იტვირთება...' : 'შენახვა...';
+
+      Promise.all(pendingFiles.map(function (f) { return HT_DATA.adminUploadTourImage(slug, f); }))
+        .then(function (uploadedUrls) {
+          return Promise.all(removedImages.map(function (url) { return HT_DATA.adminDeleteTourImage(url); }))
+            .then(function () { return uploadedUrls; });
+        })
+        .then(function (uploadedUrls) {
+          fields.images = currentImages.concat(uploadedUrls);
+          if (editingId) {
+            return HT_DATA.adminUpdateTour(editingId, fields);
+          }
+          fields.slug = slug;
+          fields.theme = 'th-2'; fields.icon = 'mountain';
+          fields.itinerary = [{ day: 1, title: 'ტურის დღე 1', desc: fields.summary || '' }];
+          return HT_DATA.adminAddTour(fields);
+        })
+        .then(function () {
+          HT.toast(editingId ? 'ტური განახლდა' : 'ტური დაემატა');
+          renderAll();
+          tourModal.classList.remove('open');
+        })
+        .catch(function (err) {
+          HT.toast('შენახვა ვერ მოხერხდა — საჭიროა Google-ით შესვლა ადმინის ანგარიშით');
+          console.error(err);
+        })
+        .then(function () {
+          saveBtn.disabled = false;
+          statusEl.textContent = '';
+        });
     });
   })();
 </script>

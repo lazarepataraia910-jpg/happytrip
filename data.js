@@ -891,6 +891,7 @@
       inclusions: row.inclusions || [], exclusions: row.exclusions || [],
       meetingPoint: row.meeting_point, languages: row.languages || [],
       itinerary: row.itinerary || [], theme: row.theme, icon: row.icon,
+      images: row.images || [],
       featured: row.featured, rating: row.rating, reviewCount: row.review_count,
       reviews: (reviewsByTourId[row.id] || []).map(mapReviewRow)
     };
@@ -1004,6 +1005,24 @@
     adminDeleteTour: function (id) {
       return getSupabaseClient().then(function (client) { return client.from('tours').delete().eq('id', id); })
         .then(function (res) { if (res.error) throw res.error; return refreshFromSupabase(); });
+    },
+    adminUploadTourImage: function (tourSlug, file) {
+      var path = 'tours/' + tourSlug + '/' + Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      return getSupabaseClient().then(function (client) {
+        return client.storage.from('happytrip-images').upload(path, file).then(function (res) {
+          if (res.error) throw res.error;
+          return client.storage.from('happytrip-images').getPublicUrl(path).data.publicUrl;
+        });
+      });
+    },
+    adminDeleteTourImage: function (url) {
+      var marker = '/happytrip-images/';
+      var idx = url.indexOf(marker);
+      if (idx === -1) return Promise.resolve();
+      var path = url.slice(idx + marker.length);
+      return getSupabaseClient().then(function (client) {
+        return client.storage.from('happytrip-images').remove([path]);
+      });
     }
   };
 
